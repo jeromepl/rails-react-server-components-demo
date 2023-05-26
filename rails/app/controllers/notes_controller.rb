@@ -1,4 +1,4 @@
-class RscController < ApplicationController
+class NotesController < ApplicationController
   def create
     note = Note.create!(title: params[:title], body: params[:body])
     render_app(selectedId: note.id, isEditing: false, searchText: props["searchText"])
