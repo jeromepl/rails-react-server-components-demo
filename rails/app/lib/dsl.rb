@@ -14,22 +14,27 @@ class Dsl < Registry
     end.join("\n")
   end
 
-  def method_missing(method_name, *_args, **_kwargs, &block)
+  def method_missing(method_name, *_args, **props, &block)
     is_first_component = @index.zero?
     @index += 1 if is_first_component
 
     # Get component from registry
     component = Registry::COMPONENTS[method_name.to_sym]
-    reference = register_component_in_output(component) unless component_exists_in_output?(component)
+    reference = if component
+      component_reference(component)
+    else
+      method_name
+    end
 
-    children = block_given? ? [block.call] : []
+    children = block_given? ? Array.wrap(block.call) : []
 
     result = {
       type: 'tree',
       index: 0,
       reference:,
       props: {
-        children:
+        children:,
+        **props,
       }.compact_blank
     }
     output << result if is_first_component
@@ -38,7 +43,7 @@ class Dsl < Registry
 
   def parse_output_item(output_item)
     if output_item[:type] == 'tree'
-      "#{output_item[:index]}:#{parse_output_tree_item(output_item)}"
+      "#{output_item[:index]}:#{parse_output_tree_item(output_item).to_json}"
     elsif output_item[:type] == 'component'
       "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
     end
@@ -46,10 +51,8 @@ class Dsl < Registry
 
   def parse_output_tree_item(output_tree_item)
     props = { **output_tree_item[:props] }
-    props[:children] = [output_tree_item[:props][:children].map { |item |parse_output_tree_item(item) }] if output_tree_item[:props].key?(:children)
-    "[\"$\",\"#{output_tree_item[:reference]}\",\"null\",#{props.to_json.gsub("\\", "")}]"
-  rescue StandardError => e
-    debugger
+    props[:children] = output_tree_item[:props][:children].map { |item| item.is_a?(Hash) ? parse_output_tree_item(item) : item } if output_tree_item[:props].key?(:children)
+    ["$","#{output_tree_item[:reference]}","null",props]
   end
 
   def register_component_in_output(component)
@@ -68,11 +71,15 @@ class Dsl < Registry
   # "search_field"=>{"id"=>"./src/SearchField.js", "chunks"=>["client2"], "name"=>""},
   # "sidebar_note_content"=>{"id"=>"./src/SidebarNoteContent.js", "chunks"=>["client3"], "name"=>""}}
 
-  def component_exists_in_output?(component)
-    return true if component.blank?
+  def component_reference(component)
+    # return true if component.blank?
 
-    output.any? do |registered_component|
-      return true if registered_component["id"] == component["id"]
-    end
+    found_index = output.find do |registered_component|
+      registered_component["id"] == component["id"]
+    end&.fetch(:index)
+    
+    return register_component_in_output(component) unless found_index
+
+    "L#{found_index}"
   end
 end
