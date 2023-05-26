@@ -12,6 +12,6 @@ REGISTRY = client_manifest.each_value.filter_map do |entry|
   [component_name.to_sym, entry]
 end.to_h.with_indifferent_access
 
-class Registry
+module Registry
   COMPONENTS = REGISTRY
 end

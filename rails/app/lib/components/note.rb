@@ -1,5 +1,5 @@
 module Components
-  class Note < Dsl
+  class Note < Component
     attr_reader :selectedId, :isEditing
 
     def initialize(selectedId:, isEditing:)

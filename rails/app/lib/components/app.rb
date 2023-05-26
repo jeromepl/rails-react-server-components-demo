@@ -1,5 +1,5 @@
 module Components
-  class App < Dsl
+  class App < Component
     attr_reader :selectedId, :isEditing, :searchText
 
     def initialize(selectedId:, isEditing:, searchText:)

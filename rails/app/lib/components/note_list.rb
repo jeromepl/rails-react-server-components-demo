@@ -1,5 +1,5 @@
 module Components
-  class NoteList < Dsl
+  class NoteList < Component
     attr_reader :searchText
 
     def initialize(searchText:)
