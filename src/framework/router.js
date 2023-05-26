@@ -60,9 +60,6 @@ export function Router() {
 
   function navigate(nextLocation) {
     startTransition(() => {
-      console.log(location);
-      console.log(nextLocation);
-
       setLocation(loc => ({
         ...loc,
         ...nextLocation

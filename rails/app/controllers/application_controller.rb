@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::API
+  include ActionController::Live
+
   def render_app(**props)
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["X-Location"] = props.to_json

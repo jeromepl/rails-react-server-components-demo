@@ -28,6 +28,6 @@ class Engine
         item.is_a?(Hash) ? parse_output_tree_item(item) : item
       end
     end
-    ['$', "#{output_tree_item[:reference]}", 'null', props]
+    ['$', "#{output_tree_item[:reference]}", props[:key].presence || nil, props.except(:key)]
   end
 end
