@@ -28,20 +28,16 @@ module Components
                 ]
               end,
               nav do
-                # Suspense fallback: {NoteListSkeleton /}
-                suspense(fallback: div { 'a' }) do
+                suspense(fallback: note_list_skeleton) do
                   NoteList.new(searchText: searchText)
                 end
-                # /Suspense
               end
             ]
           end,
           section(key: selectedId, className: 'col note-viewer') do
-            # Suspense fallback: {NoteSkeleton isEditing: {isEditing} /}
-            suspense(fallback: "Loading...") do
-              h1 { "Test" }
+            suspense(fallback: note_skeleton(isEditing: isEditing)) do
+              Note.new(selectedId: selectedId, isEditing: isEditing)
             end
-            # /Suspense
           end
         ]
       end

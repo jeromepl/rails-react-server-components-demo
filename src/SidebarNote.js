@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+'use client';
 
 import {format, isToday} from 'date-fns';
 import excerpts from 'excerpts';

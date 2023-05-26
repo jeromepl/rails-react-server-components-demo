@@ -6,4 +6,4 @@
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
 
-Note.create!('Meeting Notes', 'This is an example note. It contains **Markdown**!')
+Note.create!(title: 'Meeting Notes', body: 'This is an example note. It contains **Markdown**!')

@@ -57,9 +57,9 @@ class Component
       index: component_index,
       reference:,
       props: {
-        children:,
+        **{ children: }.compact_blank,
         **props
-      }.compact_blank
+      }
     }
   end
 

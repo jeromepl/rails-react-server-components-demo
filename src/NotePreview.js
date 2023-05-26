@@ -6,6 +6,8 @@
  *
  */
 
+'use client';
+
 import TextWithMarkdown from './TextWithMarkdown';
 
 export default function NotePreview({body}) {

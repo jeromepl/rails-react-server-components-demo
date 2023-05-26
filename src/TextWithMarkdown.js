@@ -28,7 +28,7 @@ export default function TextWithMarkdown({text}) {
     <div
       className="text-with-markdown"
       dangerouslySetInnerHTML={{
-        __html: sanitizeHtml(marked(text), {
+        __html: sanitizeHtml(marked(text || ""), {
           allowedTags,
           allowedAttributes,
         }),

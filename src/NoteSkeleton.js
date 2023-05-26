@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+'use client';
 
 export default function NoteSkeleton({isEditing}) {
   return isEditing ? <NoteEditorSkeleton /> : <NotePreviewSkeleton />;
