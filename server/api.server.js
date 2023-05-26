@@ -27,12 +27,16 @@ const path = require('path');
 const {Pool} = require('pg');
 const React = require('react');
 const ReactApp = require('../src/App').default;
+const proxy = require('express-http-proxy');
 
 // Don't keep credentials in the source tree in a real app!
 const pool = new Pool(require('../credentials'));
 
 const PORT = process.env.PORT || 4000;
 const app = express();
+
+app.use('/rails', proxy('http://server:3000'));
+// app.disable('etag');
 
 app.use(compress());
 app.use(express.json());
