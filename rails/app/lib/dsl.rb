@@ -10,8 +10,8 @@ class Dsl < Registry
     render
 
     output.map do |output_item|
-      parse_output_item(output_item)
-    end.join("\n")
+      parse_output_item(output_item) + "\n"
+    end
   end
 
   def method_missing(method_name, *_args, **props, &block)
