@@ -4,6 +4,12 @@ class NotesController < ApplicationController
     render_app(selectedId: note.id, isEditing: false, searchText: props["searchText"])
   end
 
+  def update
+    note = Note.find(params[:id])
+    note.update!(title: params[:title], body: params[:body])
+    render_app(selectedId: note.id, isEditing: false, searchText: props["searchText"])
+  end
+
   private
 
   def props
