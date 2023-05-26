@@ -9,6 +9,11 @@ class NotesController < ApplicationController
     note.update!(title: params[:title], body: params[:body])
     render_app(selectedId: note.id, isEditing: false, searchText: props["searchText"])
   end
+  
+  def delete
+    Note.find(params[:note_id]).destroy!
+    render_app(selectedId: nil, isEditing: false, searchText: props["searchText"])
+  end
 
   private
 

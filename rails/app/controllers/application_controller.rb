@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   def render_app(**props)
     response.headers["X-Accel-Buffering"] = "no"
+    response.headers["X-Location"] = props.to_json
 
     lines = []
     engine = Engine.new

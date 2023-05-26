@@ -48,6 +48,7 @@ export function Router() {
       const nextCache = new Map();
       if (response != null) {
         const locationKey = response.headers.get('X-Location');
+        console.log(JSON.stringify(response.headers))
         const nextLocation = JSON.parse(locationKey);
         const nextContent = createFromReadableStream(response.body);
         nextCache.set(locationKey, nextContent);
@@ -59,6 +60,9 @@ export function Router() {
 
   function navigate(nextLocation) {
     startTransition(() => {
+      console.log(location);
+      console.log(nextLocation);
+
       setLocation(loc => ({
         ...loc,
         ...nextLocation
@@ -102,9 +106,12 @@ export function useMutation({endpoint, method}) {
           },
         }
       );
+
       if (!response.ok) {
         throw new Error(await response.text());
       }
+      console.log(...response.headers)
+
       refresh(response);
     } catch (e) {
       setDidError(true);
