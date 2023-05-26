@@ -1,5 +1,5 @@
 module Components
-  class Note < Component
+  class Note < AsyncComponent
     attr_reader :selectedId, :isEditing
 
     def initialize(selectedId:, isEditing:)
