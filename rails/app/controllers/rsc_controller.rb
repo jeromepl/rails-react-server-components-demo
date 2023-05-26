@@ -17,12 +17,21 @@ class RscController < ApplicationController
   def show
     response.headers["X-Accel-Buffering"] = "no"
 
+    # response.headers['Content-Type'] = 'text/event-stream'
+    # 100.times {
+    #   response.stream.write "hello world\n"
+    #   sleep 1
+    # }
+    lines = []
+    props = JSON.parse(params[:location])
     engine = Engine.new
     component = Components::App.new(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
     component.engine = engine
     main_tree = component.render
     (engine.output + [main_tree]).each do |output_item|
-      response.stream.write "#{engine.parse_output_item(output_item)}\n"
+      line = "#{engine.parse_output_item(output_item)}\n"
+      lines << line
+      response.stream.write line
     end
 
     Sync do
@@ -36,7 +45,11 @@ class RscController < ApplicationController
             main_tree = async_component[:component].render
             main_tree[:index] = async_component[:index]
             (engine.output + [main_tree]).each do |output_item|
-              response.stream.write "#{engine.parse_output_item(output_item)}\n"
+              line = "#{engine.parse_output_item(output_item)}\n"
+              next if lines.include?(line)
+
+              lines << line
+              response.stream.write line
             end
           end
         end

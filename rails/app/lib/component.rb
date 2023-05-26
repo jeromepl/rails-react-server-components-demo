@@ -7,10 +7,10 @@ class Component
   end
 
   def method_missing(method_name, *_args, **props, &block)
-    if root_component
+    if @root_component
       component_index = engine.index
       engine.index = engine.index + 1
-      root_component = false
+      @root_component = false
     else
       component_index = nil
     end
