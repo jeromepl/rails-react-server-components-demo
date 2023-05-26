@@ -26,26 +26,11 @@ class Dsl < Registry
 
     # Get component from registry
     component = Registry::COMPONENTS[method_name.to_sym]
-<<<<<<< HEAD
-    reference = if component
-                  component_reference(component)
-                else
-                  method_name
-                end
-||||||| parent of ce10964 (Add (partial) suspense support)
-    reference = if component
-      component_reference(component)
-    else
-      method_name
-    end
-=======
     reference = if component || method_name == "suspense"
       component_reference(component)
     else
       method_name
     end
->>>>>>> ce10964 (Add (partial) suspense support)
-
     children = block_given? ? Array.wrap(block.call) : []
     children = children.map do |child|
       if child.is_a?(Dsl)
@@ -73,28 +58,23 @@ class Dsl < Registry
         **props
       }.compact_blank
     }
-  rescue StandardError => e
-    debugger
   end
 
   def parse_output_item(output_item)
     if output_item[:type] == 'tree'
       "#{output_item[:index]}:#{parse_output_tree_item(output_item).to_json}"
     elsif output_item[:type] == 'component'
-<<<<<<< HEAD
-      "#{output_item[:index]}:I#{output_item.to_json.gsub('\\', '')}"
-||||||| parent of ce10964 (Add (partial) suspense support)
-      "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
-=======
       "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
     elsif output_item[:type] == 'suspense'
       "#{output_item[:index]}:\"$Sreact.suspense\""
->>>>>>> ce10964 (Add (partial) suspense support)
     end
   end
 
   def parse_output_tree_item(output_tree_item)
-    props = { **output_tree_item[:props] }
+    props = output_tree_item[:props].inject({}) do |h, (k, v)|
+      h[k] = v.is_a?(Hash) ? parse_output_tree_item(v) : v
+      h
+    end
     if output_tree_item[:props].key?(:children)
       props[:children] = output_tree_item[:props][:children].map do |item|
         item.is_a?(Hash) ? parse_output_tree_item(item) : item

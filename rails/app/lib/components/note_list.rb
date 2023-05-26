@@ -3,7 +3,7 @@ module Components
     attr_reader :searchText
 
     def initialize(searchText:)
-      @searchText = ""
+      @searchText = searchText
 
       super()
     end

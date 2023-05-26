@@ -2,12 +2,12 @@ module Components
   class App < Dsl
     attr_reader :selectedId, :isEditing, :searchText
 
-    def initialize
-      @selectedId = nil
-      @isEditing = false
-      @searchText = ''
+    def initialize(selectedId:, isEditing:, searchText:)
+      @selectedId = selectedId
+      @isEditing = isEditing
+      @searchText = searchText
 
-      super
+      super()
     end
 
     def render
