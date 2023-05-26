@@ -1,0 +1,1 @@
+class AsyncComponent < Component; end
