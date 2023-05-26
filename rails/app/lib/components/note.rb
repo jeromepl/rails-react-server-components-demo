@@ -11,8 +11,26 @@ module Components
 
     def render
       return render_no_selected_id if selectedId.blank?
+      return note_editor(noteId: note.id, initialTitle: note.title, initialBody: note.body) if isEditing
 
-      
+      div(className: "note") do
+        [
+          div(className: "note-header") do
+            [
+              h1(className: "note-title") { note.title },
+              div(className: "note-menu", role: "menubar") do
+                [
+                  small(className: "note-updated-at", role: "status") do
+                    "Last updated on #{note.updated_at}"
+                  end,
+                  edit_button(noteId: note.id) { "Edit" }
+                ]
+              end
+            ]
+          end,
+          note_preview(body: note.body)
+        ]
+      end
     end
 
     private
@@ -25,6 +43,10 @@ module Components
           "Click a note on the left to view something! 🥺"
         end
       end
+    end
+
+    def note
+      @note ||= Note.find(selectedId)
     end
   end
 end
