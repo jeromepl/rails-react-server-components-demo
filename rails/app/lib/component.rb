@@ -1,25 +1,15 @@
 class Component
-  include Registry
-  attr_accessor :index, :output, :root_component
+  attr_accessor :engine, :index, :output, :root_component
 
   def initialize
-    @index = 0
-    @output = []
+    @engine = nil
     @root_component = true
-  end
-
-  def serialize!
-    output << render
-
-    output.map do |output_item|
-      parse_output_item(output_item) + "\n"
-    end
   end
 
   def method_missing(method_name, *_args, **props, &block)
     if root_component
-      component_index = index
-      @index += 1
+      component_index = engine.index
+      engine.index = engine.index + 1
       root_component = false
     else
       component_index = nil
@@ -36,17 +26,21 @@ class Component
     end
     children = block_given? ? Array.wrap(block.call) : []
     children = children.map do |child|
-      if child.is_a?(Component)
-        child.index = index
-        child.output = output
+      if child.is_a?(AsyncComponent)
         child.root_component = false
+        child.engine = engine
 
-        child_output = child.render
+        engine.async_components << {
+          index: engine.index,
+          component: child
+        }
+        engine.index = engine.index + 1
+        "$L#{engine.index - 1}"
+      elsif child.is_a?(Component)
+        child.root_component = false
+        child.engine = engine
 
-        output = child.output
-        @index = child.index
-
-        child_output
+        child.render
       else
         child
       end
@@ -63,46 +57,23 @@ class Component
     }
   end
 
-  def parse_output_item(output_item)
-    if output_item[:type] == 'tree'
-      "#{output_item[:index]}:#{parse_output_tree_item(output_item).to_json}"
-    elsif output_item[:type] == 'component'
-      "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
-    elsif output_item[:type] == 'suspense'
-      "#{output_item[:index]}:\"$Sreact.suspense\""
-    end
-  end
-
-  def parse_output_tree_item(output_tree_item)
-    props = output_tree_item[:props].inject({}) do |h, (k, v)|
-      h[k] = v.is_a?(Hash) ? parse_output_tree_item(v) : v
-      h
-    end
-    if output_tree_item[:props].key?(:children)
-      props[:children] = output_tree_item[:props][:children].map do |item|
-        item.is_a?(Hash) ? parse_output_tree_item(item) : item
-      end
-    end
-    ['$', "#{output_tree_item[:reference]}", 'null', props]
-  end
-
   def register_suspense_in_output
-    output << {
+    engine.output << {
       type: 'suspense',
-      index:,
+      index: engine.index,
     }
-    @index += 1
-    "$#{index - 1}"
+    engine.index = engine.index + 1
+    "$#{engine.index - 1}"
   end
 
   def register_component_in_output(component)
-    output << {
+    engine.output << {
       type: 'component',
-      index:,
+      index: engine.index,
       **component
     }
-    @index += 1
-    "$L#{index - 1}"
+    engine.index = engine.index + 1
+    "$L#{engine.index - 1}"
   end
 
   # {"router"=>{"id"=>"./src/framework/router.js", "chunks"=>["main"], "name"=>""},
@@ -114,7 +85,7 @@ class Component
   def component_reference(component)
     # return true if component.blank?
     if component == :suspense
-      found_index = output.find do |registered_component|
+      found_index = engine.output.find do |registered_component|
         registered_component[:type] == 'suspense'
       end&.fetch(:index)
 
@@ -123,7 +94,7 @@ class Component
       return register_suspense_in_output
     end
 
-    found_index = output.find do |registered_component|
+    found_index = engine.output.find do |registered_component|
       registered_component['id'] == component['id']
     end&.fetch(:index)
 

@@ -1,5 +1,5 @@
 module Components
-  class NoteList < Component
+  class NoteList < AsyncComponent
     attr_reader :searchText
 
     def initialize(searchText:)

@@ -21,9 +21,24 @@ class RscController < ApplicationController
     #   sleep 1
     # }
     props = JSON.parse(params[:location])
-    Components::App.new(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"]).serialize!.each do |line|
-      response.stream.write line
-      # sleep 2
+    engine = Engine.new
+    component = Components::App.new(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
+    component.engine = engine
+    main_tree = component.render
+    (engine.output + [main_tree]).each do |output_item|
+      response.stream.write "#{engine.parse_output_item(output_item)}\n"
+    end
+    while engine.async_components.any?
+      components = engine.async_components
+      engine.async_components = []
+
+      components.each do |async_component|
+        main_tree = async_component[:component].render
+        main_tree[:index] = async_component[:index]
+        (engine.output + [main_tree]).each do |output_item|
+          response.stream.write "#{engine.parse_output_item(output_item)}\n"
+        end
+      end
     end
     # sleep 5
   ensure
