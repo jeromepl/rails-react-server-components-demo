@@ -11,3 +11,7 @@ REGISTRY = client_manifest.each_value.filter_map do |entry|
   component_name = /\/([a-zA-Z]+)\./.match(entry["id"])[1].underscore
   [component_name.to_sym, entry]
 end.to_h.with_indifferent_access
+
+class Registry
+  COMPONENTS = REGISTRY
+end

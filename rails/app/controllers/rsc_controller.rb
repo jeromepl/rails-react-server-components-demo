@@ -1,5 +1,5 @@
 class RscController < ApplicationController
   def show
-    render json: { a: 2 }
+    render plain: Component.new.serialize!
   end
 end
