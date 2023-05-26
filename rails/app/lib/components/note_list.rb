@@ -2,10 +2,10 @@ module Components
   class NoteList < Dsl
     attr_reader :searchText
 
-    def initialize
+    def initialize(searchText:)
       @searchText = ""
 
-      super
+      super()
     end
 
     def render

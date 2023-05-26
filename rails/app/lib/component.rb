@@ -4,38 +4,38 @@ class Component < Dsl
   def initialize
     @selectedId = nil
     @isEditing = false
-    @searchText = ""
+    @searchText = ''
 
     super
   end
 
   def render
-    div className: "main" do
+    div className: 'main' do
       [
-        section(className: "col sidebar") do
+        section(className: 'col sidebar') do
           [
-            section(className: "sidebar-header") do
+            section(className: 'sidebar-header') do
               [
-                img(className: "logo", src: "logo.svg", width: "22px", height: "20px", alt: "", role: "presentation"),
-                strong { "React Notes" }
+                img(className: 'logo', src: 'logo.svg', width: '22px', height: '20px', alt: '', role: 'presentation'),
+                strong { 'React Notes' }
               ]
             end,
-            section(className: "sidebar-menu", role: "menubar") do
+            section(className: 'sidebar-menu', role: 'menubar') do
               [
                 search_field,
-                edit_button(noteId: nil) { "New" }
+                edit_button(noteId: nil) { 'New' }
               ]
             end,
             nav do
               # Suspense fallback: {NoteListSkeleton /}
-                note_list searchText: searchText
+              note_list searchText:
               # /Suspense
             end
           ]
         end,
-        section(key: selectedId, className: "col note-viewer") do
+        section(key: selectedId, className: 'col note-viewer') do
           # Suspense fallback: {NoteSkeleton isEditing: {isEditing} /}
-            note selectedId: selectedId, isEditing: isEditing
+          note selectedId:, isEditing:
           # /Suspense
         end
       ]

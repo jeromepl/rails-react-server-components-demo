@@ -1,5 +1,5 @@
 class RscController < ApplicationController
   def show
-    render plain: Component.new.serialize!
+    render plain: Components::App.new.serialize!
   end
 end

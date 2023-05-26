@@ -1,13 +1,14 @@
 class Dsl < Registry
-  attr_accessor :index, :output
+  attr_accessor :index, :output, :root_component
 
   def initialize
     @index = 0
     @output = []
+    @root_component = true
   end
 
   def serialize!
-    render
+    output << render
 
     output.map do |output_item|
       parse_output_item(output_item) + "\n"
@@ -15,44 +16,69 @@ class Dsl < Registry
   end
 
   def method_missing(method_name, *_args, **props, &block)
-    is_first_component = @index.zero?
-    @index += 1 if is_first_component
+    if root_component
+      component_index = index
+      @index += 1
+      root_component = false
+    else
+      component_index = nil
+    end
 
     # Get component from registry
     component = Registry::COMPONENTS[method_name.to_sym]
     reference = if component
-      component_reference(component)
-    else
-      method_name
-    end
+                  component_reference(component)
+                else
+                  method_name
+                end
 
     children = block_given? ? Array.wrap(block.call) : []
+    children = children.map do |child|
+      if child.is_a?(Dsl)
+        child.index = index
+        child.output = output
+        child.root_component = false
 
-    result = {
+        child_output = child.render
+
+        output = child.output
+        @index = child.index
+
+        child_output
+      else
+        child
+      end
+    end
+
+    {
       type: 'tree',
-      index: 0,
+      index: component_index,
       reference:,
       props: {
         children:,
-        **props,
+        **props
       }.compact_blank
     }
-    output << result if is_first_component
-    result
+  rescue StandardError => e
+    debugger
   end
 
   def parse_output_item(output_item)
     if output_item[:type] == 'tree'
       "#{output_item[:index]}:#{parse_output_tree_item(output_item).to_json}"
     elsif output_item[:type] == 'component'
-      "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
+      "#{output_item[:index]}:I#{output_item.to_json.gsub('\\', '')}"
     end
   end
 
   def parse_output_tree_item(output_tree_item)
     props = { **output_tree_item[:props] }
-    props[:children] = output_tree_item[:props][:children].map { |item| item.is_a?(Hash) ? parse_output_tree_item(item) : item } if output_tree_item[:props].key?(:children)
-    ["$","#{output_tree_item[:reference]}","null",props]
+    if output_tree_item[:props].key?(:children)
+      props[:children] = output_tree_item[:props][:children].map do |item|
+        item.is_a?(Hash) ? parse_output_tree_item(item) : item
+      end
+    end
+    ['$', "#{output_tree_item[:reference]}", 'null', props]
   end
 
   def register_component_in_output(component)
@@ -75,9 +101,9 @@ class Dsl < Registry
     # return true if component.blank?
 
     found_index = output.find do |registered_component|
-      registered_component["id"] == component["id"]
+      registered_component['id'] == component['id']
     end&.fetch(:index)
-    
+
     return register_component_in_output(component) unless found_index
 
     "L#{found_index}"
