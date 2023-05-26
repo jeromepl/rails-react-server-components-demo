@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+# path to your application root.
+APP_ROOT = File.expand_path("..", __dir__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+FileUtils.chdir APP_ROOT do
+  system! 'rm -f tmp/pids/server.pid'
+
+  system! "bundle exec rails s -p 3000 -b '0.0.0.0'"
+end
