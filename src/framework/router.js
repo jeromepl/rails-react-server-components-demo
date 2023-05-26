@@ -91,7 +91,7 @@ export function useMutation({endpoint, method}) {
     setIsSaving(true);
     try {
       const response = await fetch(
-        `${endpoint}?location=${encodeURIComponent(
+        `http://localhost:3000${endpoint}?location=${encodeURIComponent(
           JSON.stringify(requestedLocation)
         )}`,
         {
