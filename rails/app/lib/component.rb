@@ -24,7 +24,23 @@ class Component
     else
       method_name
     end
-    children = block_given? ? Array.wrap(block.call) : []
+
+    engine.component_stack.push([])
+    block_return = block.call if block_given?
+    children = engine.component_stack.pop
+
+    # TODO: Hacky, but works for this demo
+    # since we never have the cases where:
+    #  1) there is a string used but not as return value
+    #  2) or; there is an AsyncComponent used but not as return value
+    children << block_return if block_return.is_a?(String) || block_return.is_a?(AsyncComponent)
+
+    # Remove elements from the array at the top of the stack
+    # when they are used as props (detect them through kwargs here?)
+    props.each_value do |prop_value|
+      engine.component_stack.last&.delete(prop_value)
+    end
+
     children = children.map do |child|
       if child.is_a?(AsyncComponent)
         child.root_component = false
@@ -46,7 +62,7 @@ class Component
       end
     end
 
-    {
+    result = {
       type: 'tree',
       index: component_index,
       reference:,
@@ -55,6 +71,10 @@ class Component
         **props
       }
     }
+
+    engine.component_stack.last&.push(result)
+
+    result
   end
 
   def register_suspense_in_output

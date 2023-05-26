@@ -1,10 +1,11 @@
 class Engine
-  attr_accessor :index, :output, :async_components
+  attr_accessor :index, :output, :async_components, :component_stack
 
   def initialize
     @index = 0
     @output = []
     @async_components = []
+    @component_stack = []
   end
 
   def parse_output_item(output_item)

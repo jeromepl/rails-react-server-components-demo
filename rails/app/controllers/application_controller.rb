@@ -21,7 +21,9 @@ class ApplicationController < ActionController::API
 
         components.each do |async_component|
           Async do
+            engine.component_stack.push([])
             main_tree = async_component[:component].render
+            engine.component_stack.pop
             main_tree[:index] = async_component[:index]
             (engine.output + [main_tree]).each do |output_item|
               line = "#{engine.parse_output_item(output_item)}\n"
