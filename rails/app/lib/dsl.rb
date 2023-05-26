@@ -26,8 +26,10 @@ class Dsl < Registry
 
     # Get component from registry
     component = Registry::COMPONENTS[method_name.to_sym]
-    reference = if component || method_name == "suspense"
+    reference = if component
       component_reference(component)
+    elsif method_name == :suspense
+      component_reference(:suspense)
     else
       method_name
     end
@@ -89,7 +91,7 @@ class Dsl < Registry
       index:,
     }
     @index += 1
-    "$L#{index - 1}"
+    "$#{index - 1}"
   end
 
   def register_component_in_output(component)
@@ -110,7 +112,15 @@ class Dsl < Registry
 
   def component_reference(component)
     # return true if component.blank?
-    return register_suspense_in_output if component == "suspense"
+    if component == :suspense
+      found_index = output.find do |registered_component|
+        registered_component[:type] == 'suspense'
+      end&.fetch(:index)
+
+      return "$#{found_index}" if found_index
+
+      return register_suspense_in_output
+    end
 
     found_index = output.find do |registered_component|
       registered_component['id'] == component['id']
@@ -118,6 +128,6 @@ class Dsl < Registry
 
     return register_component_in_output(component) unless found_index
 
-    "L#{found_index}"
+    "$L#{found_index}"
   end
 end
