@@ -1,6 +1,6 @@
 class RscController < ApplicationController
   def show
-    render_app(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
+    render_component(Components::App, selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
   end
 
   private

@@ -1,13 +1,13 @@
 class ApplicationController < ActionController::API
   include ActionController::Live
 
-  def render_app(**props)
+  def render_component(component_klass, **props)
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["X-Location"] = props.to_json
 
     lines = []
     engine = Engine.new
-    component = Components::App.new(**props)
+    component = component_klass.new(**props)
     component.engine = engine
     main_tree = component.render
     (engine.output + [main_tree]).each do |output_item|
