@@ -26,11 +26,25 @@ class Dsl < Registry
 
     # Get component from registry
     component = Registry::COMPONENTS[method_name.to_sym]
+<<<<<<< HEAD
     reference = if component
                   component_reference(component)
                 else
                   method_name
                 end
+||||||| parent of ce10964 (Add (partial) suspense support)
+    reference = if component
+      component_reference(component)
+    else
+      method_name
+    end
+=======
+    reference = if component || method_name == "suspense"
+      component_reference(component)
+    else
+      method_name
+    end
+>>>>>>> ce10964 (Add (partial) suspense support)
 
     children = block_given? ? Array.wrap(block.call) : []
     children = children.map do |child|
@@ -67,7 +81,15 @@ class Dsl < Registry
     if output_item[:type] == 'tree'
       "#{output_item[:index]}:#{parse_output_tree_item(output_item).to_json}"
     elsif output_item[:type] == 'component'
+<<<<<<< HEAD
       "#{output_item[:index]}:I#{output_item.to_json.gsub('\\', '')}"
+||||||| parent of ce10964 (Add (partial) suspense support)
+      "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
+=======
+      "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
+    elsif output_item[:type] == 'suspense'
+      "#{output_item[:index]}:\"$Sreact.suspense\""
+>>>>>>> ce10964 (Add (partial) suspense support)
     end
   end
 
@@ -79,6 +101,15 @@ class Dsl < Registry
       end
     end
     ['$', "#{output_tree_item[:reference]}", 'null', props]
+  end
+
+  def register_suspense_in_output
+    output << {
+      type: 'suspense',
+      index:,
+    }
+    @index += 1
+    "$L#{index - 1}"
   end
 
   def register_component_in_output(component)
@@ -99,6 +130,7 @@ class Dsl < Registry
 
   def component_reference(component)
     # return true if component.blank?
+    return register_suspense_in_output if component == "suspense"
 
     found_index = output.find do |registered_component|
       registered_component['id'] == component['id']

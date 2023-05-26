@@ -28,15 +28,17 @@ class Component < Dsl
             end,
             nav do
               # Suspense fallback: {NoteListSkeleton /}
-              note_list searchText:
-              # /Suspense
+              suspense(fallback: "Loading") do
+                note_list searchText: searchText
+              end
             end
           ]
         end,
         section(key: selectedId, className: 'col note-viewer') do
           # Suspense fallback: {NoteSkeleton isEditing: {isEditing} /}
-          note selectedId:, isEditing:
-          # /Suspense
+          suspense(fallback: "Loading") do
+            note selectedId: selectedId, isEditing: isEditing
+          end
         end
       ]
     end
