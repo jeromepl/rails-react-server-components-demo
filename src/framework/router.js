@@ -37,8 +37,8 @@ export function Router() {
   if (!content) {
     content = createFromFetch(
       // fetch('/react?location=' + encodeURIComponent(locationKey))
-      fetch('/rails/rsc?location=' + encodeURIComponent(locationKey))
-      // fetch('http://server:3000/rsc') //?location=' + encodeURIComponent(locationKey))
+      // fetch('/rails/rsc?location=' + encodeURIComponent(locationKey))
+      fetch('http://localhost:3000/rsc?location=' + encodeURIComponent(locationKey))
     );
     cache.set(locationKey, content);
   }

@@ -15,12 +15,9 @@ class RscController < ApplicationController
   # end
 
   def show
-    # response.headers['Content-Type'] = 'text/event-stream'
-    # 100.times {
-    #   response.stream.write "hello world\n"
-    #   sleep 1
-    # }
-    props = JSON.parse(params[:location])
+    response.headers["X-Accel-Buffering"] = "no"
+    response.headers['Content-Type'] = 'text/event-stream'
+
     engine = Engine.new
     component = Components::App.new(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
     component.engine = engine
@@ -28,20 +25,31 @@ class RscController < ApplicationController
     (engine.output + [main_tree]).each do |output_item|
       response.stream.write "#{engine.parse_output_item(output_item)}\n"
     end
-    while engine.async_components.any?
-      components = engine.async_components
-      engine.async_components = []
 
-      components.each do |async_component|
-        main_tree = async_component[:component].render
-        main_tree[:index] = async_component[:index]
-        (engine.output + [main_tree]).each do |output_item|
-          response.stream.write "#{engine.parse_output_item(output_item)}\n"
+    Sync do
+      while engine.async_components.any?
+        components = engine.async_components
+        engine.async_components = []
+
+        components.each do |async_component|
+          Async do
+            sleep 2
+            main_tree = async_component[:component].render
+            main_tree[:index] = async_component[:index]
+            (engine.output + [main_tree]).each do |output_item|
+              response.stream.write "#{engine.parse_output_item(output_item)}\n"
+            end
+          end
         end
       end
     end
-    # sleep 5
   ensure
     response.stream.close
+  end
+
+  private
+
+  def props
+    @props ||= JSON.parse(params[:location])
   end
 end
