@@ -16,7 +16,6 @@ class RscController < ApplicationController
 
   def show
     response.headers["X-Accel-Buffering"] = "no"
-    response.headers['Content-Type'] = 'text/event-stream'
 
     engine = Engine.new
     component = Components::App.new(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
