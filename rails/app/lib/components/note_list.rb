@@ -31,7 +31,7 @@ module Components
     private
 
     def notes
-      Note.where("title ilike ?", searchText).order(:id)
+      ::Note.where("title ilike ?", searchText).order(:id)
     end
   end
 end

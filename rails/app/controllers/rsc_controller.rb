@@ -21,7 +21,7 @@ class RscController < ApplicationController
     #   sleep 1
     # }
     props = JSON.parse(params[:location])
-    Components::App.new.serialize!(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"]).each do |line|
+    Components::App.new(selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"]).serialize!.each do |line|
       response.stream.write line
       # sleep 2
     end

@@ -46,7 +46,7 @@ module Components
     end
 
     def note
-      @note ||= Note.find(selectedId)
+      @note ||= ::Note.find(selectedId)
     end
   end
 end
