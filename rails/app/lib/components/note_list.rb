@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 module Components
-  class NoteList < AsyncComponent
+  class NoteList < Component
     attr_reader :searchText
 
-    def initialize(searchText:)
+    def initialize(engine, eval_stack, searchText:)
       @searchText = searchText
 
-      super()
+      super(engine, eval_stack)
     end
 
     def render
       if notes.any?
         ul className: "notes-list" do
           notes.map do |note|
-            li do
+            li key: note.id do
               sidebar_note note: note
             end
           end

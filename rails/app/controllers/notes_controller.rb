@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NotesController < ApplicationController
   def create
     note = Note.create!(title: params[:title], body: params[:body])

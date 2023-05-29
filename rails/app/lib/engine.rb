@@ -1,33 +1,58 @@
+# frozen_string_literal: true
+
 class Engine
-  attr_accessor :index, :output, :async_components, :component_stack
+  attr_accessor :global_index
+  attr_accessor :frontend_components_queue
+  attr_accessor :async_components_queue
 
   def initialize
-    @index = 0
-    @output = []
-    @async_components = []
-    @component_stack = []
+    @global_index = 0
+    @frontend_components_queue = []
+    @async_components_queue = []
   end
 
-  def parse_output_item(output_item)
-    if output_item[:type] == 'tree'
-      "#{output_item[:index]}:#{parse_output_tree_item(output_item).to_json}"
-    elsif output_item[:type] == 'component'
-      "#{output_item[:index]}:I#{output_item.to_json.gsub("\\", "")}"
-    elsif output_item[:type] == 'suspense'
-      "#{output_item[:index]}:\"$Sreact.suspense\""
+  def next_index
+    value = global_index
+    @global_index = global_index + 1
+    value
+  end
+
+  def add_frontend_component(tag, webpack_definition)
+    @frontend_components_cache ||= {}
+    @frontend_components_cache[tag] ||= begin
+      index = next_index
+      value = "#{index}:I#{webpack_definition.to_json.gsub("\\", "")}"
+      frontend_components_queue << value
+      "$L#{index}"
     end
   end
 
-  def parse_output_tree_item(output_tree_item)
-    props = output_tree_item[:props].inject({}) do |h, (k, v)|
-      h[k] = v.is_a?(Hash) ? parse_output_tree_item(v) : v
-      h
+  def add_suspense_component
+    index = next_index
+    value = "#{index}:\"$Sreact.suspense\""
+    frontend_components_queue << value
+    "$#{index}"
+  end
+
+  def add_async_component(eval_stack, component_klass, **props, &children)
+    self.class.clean_props(eval_stack, **props)
+
+    index = next_index
+    # TODO: Can we start the async process right here?
+    value = -> { component_klass.render(self, [[]], **props, &children) }
+    async_components_queue << {
+      index:,
+      value:
+    }
+    "$L#{index}"
+  end
+
+  # Remove elements from the array at the top of the stack
+  # when they are used as props (detect them through kwargs here?)
+  # FIXME: This doesn't work if a component is used exactly the same way 2 times
+  def self.clean_props(eval_stack, **props)
+    props.each_value do |prop_value|
+      eval_stack.last.delete(prop_value)
     end
-    if output_tree_item[:props].key?(:children)
-      props[:children] = output_tree_item[:props][:children].map do |item|
-        item.is_a?(Hash) ? parse_output_tree_item(item) : item
-      end
-    end
-    ['$', "#{output_tree_item[:reference]}", props[:key].presence || nil, props.except(:key)]
   end
 end

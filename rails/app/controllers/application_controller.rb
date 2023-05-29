@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::API
   include ActionController::Live
 
@@ -5,40 +7,41 @@ class ApplicationController < ActionController::API
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["X-Location"] = props.to_json
 
-    lines = []
     engine = Engine.new
-    component = component_klass.new(**props)
-    component.engine = engine
-    main_tree = component.render
-    (engine.output + [main_tree]).each do |output_item|
-      line = "#{engine.parse_output_item(output_item)}\n"
-      lines << line
-      response.stream.write line
-    end
+    index = engine.next_index
+    value = component_klass.new(engine, [[]], **props).render
+    output = "#{index}:#{value.to_json}"
 
-    Sync do
-      while engine.async_components.any?
-        components = engine.async_components
-        engine.async_components = []
+    output_batch(engine, output)
 
-        components.each do |async_component|
+    until engine.async_components_queue.empty?
+      async_components = engine.async_components_queue
+      engine.async_components_queue = []
+
+      Sync do
+        async_components.each do |async_component|
           Async do
-            engine.component_stack.push([])
-            main_tree = async_component[:component].render
-            engine.component_stack.pop
-            main_tree[:index] = async_component[:index]
-            (engine.output + [main_tree]).each do |output_item|
-              line = "#{engine.parse_output_item(output_item)}\n"
-              next if lines.include?(line)
+            async_index = async_component[:index]
+            async_value = async_component[:value].call
+            async_output = "#{async_index}:#{async_value.to_json}"
 
-              lines << line
-              response.stream.write line
-            end
+            output_batch(engine, async_output)
           end
         end
       end
     end
   ensure
     response.stream.close
+  end
+
+  private
+
+  def output_batch(engine, output)
+    frontend_components = engine.frontend_components_queue
+    engine.frontend_components_queue = []
+    frontend_components.each do |frontend_component|
+      response.stream.write "#{frontend_component}\n"
+    end
+    response.stream.write "#{output}\n"
   end
 end

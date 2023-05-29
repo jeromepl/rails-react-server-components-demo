@@ -1,17 +1,21 @@
+# frozen_string_literal: true
+
 module Components
-  class Note < AsyncComponent
+  class Note < Component
     attr_reader :selectedId, :isEditing
 
-    def initialize(selectedId:, isEditing:)
+    def initialize(engine, eval_stack, selectedId:, isEditing:)
       @selectedId = selectedId
       @isEditing = isEditing
 
-      super()
+      super(engine, eval_stack)
     end
 
     def render
       return render_no_selected_id if selectedId.blank?
       return note_editor(noteId: note.id, initialTitle: note.title, initialBody: note.body) if isEditing
+
+      sleep 2
 
       div className: "note" do
         div className: "note-header"  do
