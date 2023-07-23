@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class ApplicationController < ActionController::API
-  include ActionController::Live
+class ApplicationController < ActionController::Base
+  # include ActionController::Live
 
   def render_component(component_klass, **props)
     response.headers["X-Accel-Buffering"] = "no"
