@@ -5,31 +5,37 @@ class ApplicationController < ActionController::API
 
   def render_component(component_klass, **props)
     response.headers["X-Accel-Buffering"] = "no"
-    response.headers["X-Location"] = props.to_json
+    response.headers["X-Location"] = props.to_json # TODO: Move this out
 
-    engine = Engine.new
-    index = engine.next_index
-    value = component_klass.new(engine, [[]], **props).render
-    output = "#{index}:#{value.to_json}"
+    jsx = JsxContext.new(response.stream)
+    component_klass.render(jsx, **props)
 
-    output_batch(engine, output)
+    # TODO: Wait for async components to stream:
 
-    until engine.async_components_queue.empty?
-      async_components = engine.async_components_queue
-      engine.async_components_queue = []
 
-      Sync do
-        async_components.each do |async_component|
-          Async do
-            async_index = async_component[:index]
-            async_value = async_component[:value].call
-            async_output = "#{async_index}:#{async_value.to_json}"
+    # engine = Engine.new
+    # index = engine.next_index
+    # value = component_klass.new(engine, [[]], **props).render
+    # output = "#{index}:#{value.to_json}"
 
-            output_batch(engine, async_output)
-          end
-        end
-      end
-    end
+    # output_batch(engine, output)
+
+    # until engine.async_components_queue.empty?
+    #   async_components = engine.async_components_queue
+    #   engine.async_components_queue = []
+
+    #   Sync do
+    #     async_components.each do |async_component|
+    #       Async do
+    #         async_index = async_component[:index]
+    #         async_value = async_component[:value].call
+    #         async_output = "#{async_index}:#{async_value.to_json}"
+
+    #         output_batch(engine, async_output)
+    #       end
+    #     end
+    #   end
+    # end
   ensure
     response.stream.close
   end

@@ -4,23 +4,21 @@ module Components
   class NoteList < Component
     attr_reader :searchText
 
-    def initialize(engine, eval_stack, searchText:)
+    def initialize(searchText:)
       @searchText = searchText
-
-      super(engine, eval_stack)
     end
 
-    def render
+    def render(jsx)
       if notes.any?
-        ul className: "notes-list" do
+        jsx.ul className: "notes-list" do
           notes.map do |note|
-            li key: note.id do
-              sidebar_note note: note
+            jsx.li key: note.id do
+              jsx.sidebar_note note: note
             end
           end
         end
       else
-        div className: "notes-empty" do
+        jsx.div className: "notes-empty" do
           if searchText.present?
             "Couldn't find any notes titled '#{searchText}'"
           else

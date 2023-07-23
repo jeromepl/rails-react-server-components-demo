@@ -1,3 +1,7 @@
+# My Section
+
+https://www.plasmic.app/blog/how-react-server-components-work#the-rsc-wire-format
+
 # React Server Components Demo
 
 * [What is this?](#what-is-this)

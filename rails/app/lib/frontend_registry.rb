@@ -12,18 +12,8 @@ MANIFEST_ENTRIES = client_manifest.each_value.filter_map do |entry|
 
   component_name = /\/([a-zA-Z]+)\./.match(entry["id"])[1].underscore
   [component_name.to_sym, entry]
-end
+end.to_h
 
-module FrontendComponentRegistry
-  MANIFEST_ENTRIES.each do |tag, entry|
-    define_method(tag) do |**props, &children|
-      reference = engine.add_frontend_component(tag, entry)
-      Component.eval(eval_stack, reference, **props, &children)
-    end
-  end
-
-  def suspense(**props, &children)
-    reference = engine.add_suspense_component
-    Component.eval(eval_stack, reference, **props, &children)
-  end
+module FrontendRegistry
+  Components = MANIFEST_ENTRIES
 end
