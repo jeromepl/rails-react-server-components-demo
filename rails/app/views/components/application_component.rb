@@ -1,12 +1,5 @@
 # frozen_string_literal: true
 
-class ApplicationComponent < Phlex::HTML
+class ApplicationComponent < Phlex::JSX
   include Phlex::Rails::Helpers::Routes
-
-  if Rails.env.development?
-    def before_template
-      comment { "Before #{self.class.name}" }
-      super
-    end
-  end
 end

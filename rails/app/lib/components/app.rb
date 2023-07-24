@@ -4,7 +4,7 @@ module Components
   class App < Component
     attr_reader :selectedId, :isEditing, :searchText
 
-    def initialize(selectedId:, isEditing:, searchText:)
+    def initialize(selectedId: nil, isEditing: nil, searchText: nil)
       @selectedId = selectedId
       @isEditing = isEditing
       @searchText = searchText
@@ -23,21 +23,21 @@ module Components
               "New"
             end
           end
-          jsx.nav do
-            # jsx.suspense fallback: note_list_skeleton do
-            jsx.suspense fallback: "Loading..." do
-              # NoteList.render(jsx, searchText:)
-              jsx.render NoteList.new(searchText:)
-            end
-          end
+          # jsx.nav do
+          #   # jsx.suspense fallback: note_list_skeleton do
+          #   jsx.suspense fallback: "Loading..." do
+          #     # NoteList.render(jsx, searchText:)
+          #     jsx.render NoteList.new(searchText:)
+          #   end
+          # end
         end
-        jsx.section key: selectedId, className: "col note-viewer" do
-          # jsx.suspense fallback: note_skeleton(isEditing: isEditing) do
-          jsx.suspense fallback: "Loading..." do
-            # Note.render(jsx, selectedId: selectedId, isEditing: isEditing)
-            jsx.render Note.new(selectedId: selectedId, isEditing: isEditing)
-          end
-        end
+        # jsx.section key: selectedId, className: "col note-viewer" do
+        #   # jsx.suspense fallback: note_skeleton(isEditing: isEditing) do
+        #   jsx.suspense fallback: "Loading..." do
+        #     # Note.render(jsx, selectedId: selectedId, isEditing: isEditing)
+        #     jsx.render Note.new(selectedId: selectedId, isEditing: isEditing)
+        #   end
+        # end
       end
     end
   end

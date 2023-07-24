@@ -8,7 +8,7 @@ client_manifest = JSON.parse(response)
 # client_manifest = JSON.load_file("../build/react-client-manifest.json")
 
 MANIFEST_ENTRIES = client_manifest.each_value.filter_map do |entry|
-  next unless entry["name"] == ""
+  next unless entry["name"] == "" # Only use `default` exports
 
   component_name = /\/([a-zA-Z]+)\./.match(entry["id"])[1].underscore
   [component_name.to_sym, entry]
