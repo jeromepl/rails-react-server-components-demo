@@ -53,15 +53,11 @@ module Phlex
     end
 
     def call(buffer = nil, context: nil, view_context: nil, parent: nil, &block)
-      context = Phlex::Context.new
-      context.target = []
-      super(buffer || TopLevelBuffer.new(StringIO.new), context:, view_context:, parent:, &block)
+      super(buffer || TopLevelBuffer.new(StringIO.new), context: context || Context.new, view_context:, parent:, &block)
     end
 
     def __final_call__(buffer = nil, context: nil, view_context: nil, parent: nil, &block)
-      context = Phlex::Context.new
-      context.target = []
-      super(buffer || TopLevelBuffer.new(StringIO.new), context:, view_context:, parent:, &block)
+      super(buffer || TopLevelBuffer.new(StringIO.new), context: context || Context.new, view_context:, parent:, &block)
     end
 
     def comment(&)
@@ -78,6 +74,10 @@ module Phlex
 
     def self.format
       :text
+    end
+
+    def yield_content(...)
+      @_context.yield_content(self, ...)
     end
   end
 end

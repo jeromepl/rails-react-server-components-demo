@@ -15,11 +15,13 @@ module Phlex
           def #{method_name}(**attributes, &block)
             target = @_context.target
 
-            children = @_context.with_target([]) { yield_content(&block) } if block_given?
+            rendered_slots = {}
+            children = yield_content(react_slots_target: rendered_slots, &block) if block_given?
 
             props = {
-              **{ children: }.compact_blank,
               **attributes, # TODO: __attributes__(**attributes),
+              **rendered_slots,
+              **{ children: }.compact_blank,
             }
             key = props.delete(:key)
 
@@ -30,6 +32,21 @@ module Phlex
           end
 
           alias_method :_#{method_name}, :#{method_name}
+        RUBY
+
+        class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+          # frozen_string_literal: true
+
+          # For React components, we allow any "slots" as render them as props
+          # This allows passing JSX to a prop, for example to a Suspense component's fallback:
+          # > suspense do |c|
+          # >   c.fallback { strong { "Loading..." } }
+          # > end
+          def method_missing(m, *args, &block)
+            return super unless block_given?
+
+            @_context.add_react_slot(self, m, &block)
+          end
         RUBY
 
         registered_elements[method_name] = tag
@@ -54,11 +71,11 @@ module Phlex
             target = @_context.target
 
             reference = "#{tag}"
-            children = @_context.with_target([]) { yield_content(&block) } if block_given?
+            children = yield_content(&block) if block_given?
 
             props = {
-              **{ children: }.compact_blank,
               **attributes, # TODO: __attributes__(**attributes),
+              **{ children: }.compact_blank,
             }
             key = props.delete(:key)
 

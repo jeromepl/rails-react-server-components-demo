@@ -9,7 +9,13 @@ class TestView < ApplicationView
           strong { "React Notes" }
         end
         section className: "sidebar-menu", role: "menubar" do
-          search_field
+          search_field do |c|
+            c.fallback do
+              strong { "Loading ..." }
+            end
+
+            "with another return value"
+          end
           edit_button noteId: nil do
             "New"
           end
