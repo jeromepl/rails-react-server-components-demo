@@ -39,6 +39,37 @@ module Phlex
         method_name
       end
 
+      def register_suspense
+        class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
+          # frozen_string_literal: true
+
+          def suspense(**attributes, &block)
+            target = @_context.target
+
+            rendered_slots = {}
+            children = yield_content(react_slots_target: rendered_slots, &block) if block_given?
+
+            props = {
+              **attributes, # TODO: __attributes__(**attributes),
+              **rendered_slots,
+              **{ children: }.compact_blank,
+            }
+            key = props.delete(:key)
+
+            reference = @_buffer.write_suspense
+            target << ["$", reference, key, props]
+
+            nil
+          end
+
+          alias_method :_suspense, :suspense
+        RUBY
+
+        registered_elements["suspense"] = "suspense"
+
+        "suspense"
+      end
+
       # Register a custom element. This macro defines an element method for the current class and descendents only. There is no global element registry.
       # @param method_name [Symbol]
       # @param tag [String] the name of the tag, otherwise this will be the method name with underscores replaced with dashes.
