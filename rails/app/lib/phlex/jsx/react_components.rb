@@ -8,6 +8,17 @@ module Phlex
       FrontendRegistry::Components.each do |component_name, webpack_definition|
         register_react_component(component_name, webpack_definition)
       end
+
+      # For React components, we allow any "slots" as render them as props
+      # This allows passing JSX to a prop, for example to a Suspense component's fallback:
+      # > suspense do |c|
+      # >   c.fallback { strong { "Loading..." } }
+      # > end
+      def method_missing(m, *args, &block)
+        return super unless block_given?
+
+        @_context.add_react_slot(self, m, &block)
+      end
     end
   end
 end

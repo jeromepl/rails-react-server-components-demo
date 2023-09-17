@@ -34,21 +34,6 @@ module Phlex
           alias_method :_#{method_name}, :#{method_name}
         RUBY
 
-        class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
-          # frozen_string_literal: true
-
-          # For React components, we allow any "slots" as render them as props
-          # This allows passing JSX to a prop, for example to a Suspense component's fallback:
-          # > suspense do |c|
-          # >   c.fallback { strong { "Loading..." } }
-          # > end
-          def method_missing(m, *args, &block)
-            return super unless block_given?
-
-            @_context.add_react_slot(self, m, &block)
-          end
-        RUBY
-
         registered_elements[method_name] = tag
 
         method_name
