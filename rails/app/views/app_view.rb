@@ -17,17 +17,25 @@ class AppView < ApplicationView
           strong { "React Notes" }
         end
         section className: "sidebar-menu", role: "menubar" do
-          search_field do |c|
-            c.fallback do
-              strong { "Loading ..." }
-            end
-
-            "with another return value"
-          end
+          search_field
           edit_button noteId: nil do
             "New"
           end
         end
+        nav do
+          render NoteListComponent.new(search_text:)
+          # suspense do |c|
+          #   c.fallback { "Loading..." } # fallback: note_list_skeleton
+
+          #   render NoteList.new(search_text:)
+          # end
+        end
+      end
+      section key: selected_id, className: "col note-viewer" do
+        render NoteComponent.new(selected_id:, is_editing:)
+        # suspense fallback: note_skeleton(is_editing:) do
+        #   render Note.new(selected_id:, is_editing:)
+        # end
       end
     end
   end
