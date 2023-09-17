@@ -2,7 +2,7 @@
 
 class RscController < ApplicationController
   def show
-    render_component(Components::App, selectedId: props["selectedId"], isEditing: props["isEditing"], searchText: props["searchText"])
+    render AppView.new(selected_id: props["selectedId"], is_editing: props["isEditing"], search_text: props["searchText"])
   end
 
   private

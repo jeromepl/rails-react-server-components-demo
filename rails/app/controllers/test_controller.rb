@@ -1,7 +1,7 @@
 class TestController < ApplicationController
-  layout -> { ApplicationLayout }
+  # layout -> { ApplicationLayout }
 
   def index
-    render TestView.new
+    render AppView.new
   end
 end

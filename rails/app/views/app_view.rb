@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
-class TestView < ApplicationView
+class AppView < ApplicationView
+  attr_reader :selected_id, :is_editing, :search_text
+
+  def initialize(selected_id: nil, is_editing: false, search_text: "")
+    @selected_id = selected_id
+    @is_editing = is_editing
+    @search_text = search_text
+  end
+
   def template
     div className: "main" do
       section className: "col sidebar" do
@@ -21,19 +29,6 @@ class TestView < ApplicationView
           end
         end
       end
-    end
-  end
-
-  class << self
-    def test_old
-      buffer = StringIO.new
-      jsx = JSXContext.new(buffer)
-      Components::App.render(jsx)
-      buffer.string
-    end
-
-    def test_new
-      TestView.call
     end
   end
 end
