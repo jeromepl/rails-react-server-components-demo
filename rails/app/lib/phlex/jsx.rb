@@ -52,21 +52,17 @@ module Phlex
       self.class.__unbuffered_class__.new(self)
     end
 
-    def call(buffer = nil, context: nil, view_context: nil, parent: nil, &block)
-      super(buffer || TopLevelBuffer.new(StringIO.new), context: context || Context.new, view_context:, parent:, &block)
+    def call(buffer = nil, context: nil, view_context: nil, stream: view_context.response.stream || StringIO.new, parent: nil, &block)
+      super(buffer || TopLevelBuffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
     end
 
-    def __final_call__(buffer = nil, context: nil, view_context: nil, parent: nil, &block)
-      super(buffer || TopLevelBuffer.new(StringIO.new), context: context || Context.new, view_context:, parent:, &block)
+    def __final_call__(buffer = nil, context: nil, view_context: nil, stream: view_context.response.stream || StringIO.new, parent: nil, &block)
+      super(buffer || TopLevelBuffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
     end
 
     def comment(&)
       nil # Can't do comments in the JSON format returned
     end
-
-    # TODO: For an async render, reuse the buffer but give it a new index?
-    # We could do this through the `#render` method and check if the component is an instance of AsyncComponent or something like that?
-    # https://github.com/phlex-ruby/phlex/blob/9e5820dc69cb243e31b924f00390deb45be18fb3/lib/phlex/sgml.rb#L215
 
     def format
       self.class.format
@@ -78,6 +74,28 @@ module Phlex
 
     def yield_content(...)
       @_context.yield_content(self, ...)
+    end
+
+    def render(renderable, &block)
+      case renderable
+      when AsyncRender
+        reference = @_buffer.async do
+          # Not passing `parent:` indicates that this component should be written to the stream as a separate entry
+          renderable.call(@_buffer, context: @_context, view_context: @_view_context, &block)
+        end
+        @_context.target << reference # Put the placeholder of the async component
+        nil
+      else
+        super(renderable, &block)
+      end
+
+      nil
+    end
+
+    def render_in(view_context, &block)
+      Sync do
+        super(view_context, &block)
+      end
     end
   end
 end

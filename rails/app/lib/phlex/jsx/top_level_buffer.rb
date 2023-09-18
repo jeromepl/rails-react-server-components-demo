@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "async"
+
 module Phlex
   class JSX
     class TopLevelBuffer
@@ -13,8 +15,10 @@ module Phlex
       # Given this is the top level buffer, this method should only be called once, with
       # the top level element
       def <<(context_elements)
-        stream.write("0:#{context_elements.first.to_json}\n")
-        stream.string # TODO: Remove?
+        # FIXME: Index 0 is not correct for Async components being rendered. It should use the index from #async method below
+        index = context_elements.size > 1 ? 4 : 0 # FIXME: Fix this hardcoded hack
+        stream.write("#{index}:#{context_elements.last.to_json}\n")
+        ""
       end
       alias_method :write, :<<
 
@@ -33,6 +37,15 @@ module Phlex
           stream.write("#{index}:\"$Sreact.suspense\"\n")
           "$#{index}"
         end
+      end
+
+      def async(&block)
+        index = next_index
+        Async do
+          # TODO: This `index` needs to be re-used later when writing the top-level component
+          block.call
+        end
+        "$L#{index}"
       end
 
       private
