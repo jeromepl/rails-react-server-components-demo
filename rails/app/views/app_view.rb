@@ -24,7 +24,7 @@ class AppView < ApplicationView
         end
         nav do
           suspense do |c|
-            c.fallback { note_list_skeleton } # fallback: note_list_skeleton
+            c.fallback { note_list_skeleton }
 
             render NoteListComponent.new(search_text:)
           end

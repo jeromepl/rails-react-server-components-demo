@@ -3,18 +3,18 @@
 class NotesController < ApplicationController
   def create
     note = Note.create!(title: params[:title], body: params[:body])
-    render_component(Components::App, selectedId: note.id, isEditing: false, searchText: props["searchText"])
+    stream AppView.new(selected_id: note.id, is_editing: false, search_text: props["searchText"])
   end
 
   def update
     note = Note.find(params[:id])
     note.update!(title: params[:title], body: params[:body])
-    render_component(Components::App, selectedId: note.id, isEditing: false, searchText: props["searchText"])
+    stream AppView.new(selected_id: note.id, is_editing: false, search_text: props["searchText"])
   end
 
   def delete
     Note.find(params[:note_id]).destroy!
-    render_component(Components::App, selectedId: nil, isEditing: false, searchText: props["searchText"])
+    stream AppView.new(selected_id: nil, is_editing: false, search_text: props["searchText"])
   end
 
   private

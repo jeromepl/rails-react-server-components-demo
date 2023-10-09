@@ -1,53 +1,22 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
-  # include ActionController::Live
+  include ActionController::Live
 
-  # def render_component(component_klass, **props)
-  #   response.headers["X-Accel-Buffering"] = "no"
-  #   response.headers["X-Location"] = props.to_json # TODO: Move this out
+  # TODO: Remove this, this is only temporary while the front-end is served on a different port
+  skip_before_action :verify_authenticity_token
 
-  #   jsx = JsxContext.new(response.stream)
-  #   component_klass.render(jsx, **props)
+  def stream(...)
+    response.headers["X-Accel-Buffering"] = "no"
+    response.headers["X-Location"] = params[:location]
 
-  #   # TODO: Wait for async components to stream:
-
-
-  #   # engine = Engine.new
-  #   # index = engine.next_index
-  #   # value = component_klass.new(engine, [[]], **props).render
-  #   # output = "#{index}:#{value.to_json}"
-
-  #   # output_batch(engine, output)
-
-  #   # until engine.async_components_queue.empty?
-  #   #   async_components = engine.async_components_queue
-  #   #   engine.async_components_queue = []
-
-  #   #   Sync do
-  #   #     async_components.each do |async_component|
-  #   #       Async do
-  #   #         async_index = async_component[:index]
-  #   #         async_value = async_component[:value].call
-  #   #         async_output = "#{async_index}:#{async_value.to_json}"
-
-  #   #         output_batch(engine, async_output)
-  #   #       end
-  #   #     end
-  #   #   end
-  #   # end
-  # ensure
-  #   response.stream.close
-  # end
-
-  # private
-
-  # def output_batch(engine, output)
-  #   frontend_components = engine.frontend_components_queue
-  #   engine.frontend_components_queue = []
-  #   frontend_components.each do |frontend_component|
-  #     response.stream.write "#{frontend_component}\n"
-  #   end
-  #   response.stream.write "#{output}\n"
-  # end
+    # Use `#render_to_string` instead of `#render` since:
+    #  1. We don't care about the `format` or `content_type` options (they are fixed)
+    #  2. The `#render` method does not work with `ActionController::Live` since it
+    #     adds headers **after** the response body streaming has started, which is not allowed.
+    #     See https://github.com/rails/rails/blob/e88857bbb9d4e1dd64555c34541301870de4a45b/actionpack/lib/abstract_controller/rendering.rb#L33
+    render_to_string(...)
+  ensure
+    response.stream.close
+  end
 end

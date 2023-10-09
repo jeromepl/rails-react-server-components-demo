@@ -27,6 +27,9 @@ module Server
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = false
 
+    # We must remove the ETag middleware in order to make streaming responses work properly,
+    # otherwise this middleware will buffer the repsonse.
+    # See https://api.rubyonrails.org/classes/ActionController/Live.html
     config.middleware.delete Rack::ETag
   end
 end
