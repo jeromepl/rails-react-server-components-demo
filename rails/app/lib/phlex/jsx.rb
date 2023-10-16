@@ -52,11 +52,11 @@ module Phlex
       self.class.__unbuffered_class__.new(self)
     end
 
-    def call(buffer = nil, context: nil, view_context: nil, stream: view_context.response.stream || StringIO.new, parent: nil, &block)
+    def call(buffer = nil, context: nil, view_context: nil, stream: view_context&.response&.stream || StringIO.new, parent: nil, &block)
       super(buffer || TopLevelBuffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
     end
 
-    def __final_call__(buffer = nil, context: nil, view_context: nil, stream: view_context.response.stream || StringIO.new, parent: nil, &block)
+    def __final_call__(buffer = nil, context: nil, view_context: nil, stream: view_context&.response&.stream || StringIO.new, parent: nil, &block)
       super(buffer || TopLevelBuffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
     end
 
