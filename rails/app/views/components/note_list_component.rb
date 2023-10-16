@@ -32,7 +32,9 @@ class NoteListComponent < ApplicationComponent
   private
 
   def notes
-    sleep 2
-    Note.where("title ILIKE ?", "%#{search_text}%").order(:id)
+    @notes ||= begin
+      sleep 2
+      Note.where("title ILIKE ?", "%#{search_text}%").order(updated_at: :desc)
+    end
   end
 end

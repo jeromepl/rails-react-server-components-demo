@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class NoteComponent < ApplicationComponent
+  include Phlex::JSX::AsyncRender
+
   attr_reader :selected_id, :is_editing
 
   def initialize(selected_id:, is_editing:)
@@ -11,8 +13,6 @@ class NoteComponent < ApplicationComponent
   def template
     return render_no_selected_id if selected_id.blank?
     return note_editor(noteId: note.id, initialTitle: note.title, initialBody: note.body) if is_editing
-
-    # sleep 2
 
     div className: "note" do
       div className: "note-header" do
@@ -45,6 +45,9 @@ class NoteComponent < ApplicationComponent
   end
 
   def note
-    @note ||= Note.find(selected_id)
+    @note ||= begin
+      sleep 1
+      Note.find(selected_id)
+    end
   end
 end

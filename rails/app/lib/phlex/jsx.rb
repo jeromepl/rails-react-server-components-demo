@@ -81,7 +81,7 @@ module Phlex
       when AsyncRender
         reference = @_buffer.async do
           # Not passing `parent:` indicates that this component should be written to the stream as a separate entry
-          renderable.call(@_buffer, context: @_context, view_context: @_view_context, &block)
+          renderable.call(@_buffer, context: Context.new, view_context: @_view_context, &block)
         end
         @_context.target << reference # Put the placeholder of the async component
         nil

@@ -15,8 +15,7 @@ module Phlex
       # Given this is the top level buffer, this method should only be called once, with
       # the top level element
       def <<(context_elements)
-        # FIXME: Index 0 is not correct for Async components being rendered. It should use the index from #async method below
-        index = context_elements.size > 1 ? 4 : 0 # FIXME: Fix this hardcoded hack
+        index = Thread.current[:top_level_index] || 0
         stream.write("#{index}:#{context_elements.last.to_json}\n")
         ""
       end
@@ -42,7 +41,7 @@ module Phlex
       def async(&block)
         index = next_index
         Async do
-          # TODO: This `index` needs to be re-used later when writing the top-level component
+          Thread.current[:top_level_index] = index
           block.call
         end
         "$L#{index}"
