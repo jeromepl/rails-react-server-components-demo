@@ -12,7 +12,7 @@ class AppView < ApplicationView
   def template
     div className: "main" do
       section className: "col sidebar" do
-        section className: "sidebard-header" do
+        section className: "sidebar-header" do
           img className: "logo", src: "logo.svg", width: "22px", height: "20px", alt: "", role: "presentation"
           strong { "React Notes" }
         end
