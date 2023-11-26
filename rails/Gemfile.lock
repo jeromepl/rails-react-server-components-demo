@@ -137,6 +137,8 @@ GEM
     rack (2.2.8)
     rack-cors (2.0.1)
       rack (>= 2.0.0)
+    rack-proxy (0.7.7)
+      rack
     rack-test (2.1.0)
       rack (>= 1.3)
     rails (7.0.8)
@@ -185,6 +187,12 @@ GEM
       rspec-mocks (~> 3.12)
       rspec-support (~> 3.12)
     rspec-support (3.12.1)
+    semantic_range (3.0.0)
+    shakapacker (7.1.0)
+      activesupport (>= 5.2)
+      rack-proxy (>= 0.6.1)
+      railties (>= 5.2)
+      semantic_range (>= 2.3.0)
     sqlite3 (1.6.3-aarch64-linux)
     sqlite3 (1.6.3-arm64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
@@ -216,6 +224,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 7.0.5)
   rspec-rails (~> 6.0.0)
+  shakapacker (= 7.1)
   sqlite3 (~> 1.4)
   super_diff
   tzinfo-data
