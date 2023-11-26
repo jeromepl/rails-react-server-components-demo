@@ -10,13 +10,13 @@ class AppView < ApplicationView
   end
 
   def template
-    div className: "main" do
-      section className: "col sidebar" do
-        section className: "sidebar-header" do
-          img className: "logo", src: "logo.svg", width: "22px", height: "20px", alt: "", role: "presentation"
+    div class: "main" do
+      section class: "col sidebar" do
+        section class: "sidebar-header" do
+          img class: "logo", src: "logo.svg", width: "22px", height: "20px", alt: "", role: "presentation"
           strong { "React Notes" }
         end
-        section className: "sidebar-menu", role: "menubar" do
+        section class: "sidebar-menu", role: "menubar" do
           search_field
           edit_button noteId: nil do
             "New"
@@ -30,7 +30,7 @@ class AppView < ApplicationView
           end
         end
       end
-      section key: selected_id, className: "col note-viewer" do
+      section key: selected_id, class: "col note-viewer" do
         suspense do |c|
           c.fallback { note_skeleton(is_editing:) }
 

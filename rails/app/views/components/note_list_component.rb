@@ -11,7 +11,7 @@ class NoteListComponent < ApplicationComponent
 
   def template
     if notes.any?
-      ul className: "notes-list" do
+      ul class: "notes-list" do
         notes.map do |note|
           li key: note.id do
             sidebar_note note:
@@ -19,7 +19,7 @@ class NoteListComponent < ApplicationComponent
         end
       end
     else
-      div className: "notes-empty" do
+      div class: "notes-empty" do
         if search_text.present?
           "Couldn't find any notes titled '#{search_text}'"
         else

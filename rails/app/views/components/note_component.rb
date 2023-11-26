@@ -14,13 +14,13 @@ class NoteComponent < ApplicationComponent
     return render_no_selected_id if selected_id.blank?
     return note_editor(noteId: note.id, initialTitle: note.title, initialBody: note.body) if is_editing
 
-    div className: "note" do
-      div className: "note-header" do
-        h1 className: "note-title" do
+    div class: "note" do
+      div class: "note-header" do
+        h1 class: "note-title" do
           note.title
         end
-        div className: "note-menu", role: "menubar" do
-          small className: "note-updated-at", role: "status" do
+        div class: "note-menu", role: "menubar" do
+          small class: "note-updated-at", role: "status" do
             "Last updated on #{note.updated_at}"
           end
           edit_button noteId: note.id do
@@ -37,8 +37,8 @@ class NoteComponent < ApplicationComponent
   def render_no_selected_id
     return note_editor(noteId: nil, initialTitle: "Untitled", initialBody: "") if is_editing
 
-    div className: "note--empty-state" do
-      span className: "note-text--empty-state" do
+    div class: "note--empty-state" do
+      span class: "note-text--empty-state" do
         "Click a note on the left to view something! 🥺"
       end
     end
