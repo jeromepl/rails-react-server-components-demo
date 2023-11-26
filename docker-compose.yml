@@ -31,14 +31,17 @@ services:
       - ./credentials.js:/opt/notes-app/credentials.js
 
   server:
-      build: 
-        context: ./rails/
-        dockerfile: Dockerfile
-      command: ./bin/server
-      volumes:
-        - ./rails:/app
-      ports:
-        - "3000:3000"
+    build:
+      context: ./rails/
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    command: ./bin/server
+    volumes:
+      - ./rails:/app
+    ports:
+      - "3000:3000"
+      - "3035:3035"
 
 volumes:
   db:
