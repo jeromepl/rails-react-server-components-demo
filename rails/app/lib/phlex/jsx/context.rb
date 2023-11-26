@@ -13,7 +13,7 @@ module Phlex
         wrap_with_react_slots_target(react_slots_target) do
           content_target = []
           content_string = nil
-          with_target(content_target) { content_string = block.call(kaller) } if block_given?
+          capturing_into(content_target) { content_string = block.call(kaller) } if block_given?
           content_target << content_string if content_string.is_a?(String)
           content_target
         end
