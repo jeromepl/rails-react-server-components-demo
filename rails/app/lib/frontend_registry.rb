@@ -3,9 +3,9 @@
 require "json"
 require "net/http"
 
-response = Net::HTTP.get(URI("http://notes-app:4000/react-client-manifest.json"))
-client_manifest = JSON.parse(response)
-# client_manifest = JSON.load_file("../build/react-client-manifest.json")
+# response = Net::HTTP.get(URI("http://notes-app:4000/react-client-manifest.json"))
+# client_manifest = JSON.parse(response)
+client_manifest = JSON.load_file("public/packs/react-client-manifest.json")
 
 MANIFEST_ENTRIES = client_manifest.each_value.filter_map do |entry|
   next unless entry["name"] == "" # Only use `default` exports
