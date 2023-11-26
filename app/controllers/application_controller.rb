@@ -3,9 +3,6 @@
 class ApplicationController < ActionController::Base
   include ActionController::Live
 
-  # TODO: Remove this, this is only temporary while the front-end is served on a different port
-  skip_before_action :verify_authenticity_token
-
   def stream(...)
     response.headers["X-Accel-Buffering"] = "no"
     response.headers["X-Location"] = params[:location]
