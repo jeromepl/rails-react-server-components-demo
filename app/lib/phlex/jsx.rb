@@ -4,7 +4,6 @@ require "async"
 require "stringio"
 
 module Phlex
-  # @abstract Subclass and define {#template} to create an HTML component class.
   class JSX < SGML
     include Elements
     include Helpers
