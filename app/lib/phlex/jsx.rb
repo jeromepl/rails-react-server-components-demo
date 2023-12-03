@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "async"
 require "stringio"
 
 module Phlex
@@ -11,12 +12,16 @@ module Phlex
     include HtmlElements
     include ReactComponents
 
+    class RootElementError < StandardError
+      include Phlex::Error
+    end
+
     def call(buffer = nil, context: nil, view_context: nil, stream: view_context&.response&.stream || StringIO.new, parent: nil, &block)
-      super(buffer || TopLevelBuffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
+      super(buffer || Buffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
     end
 
     def __final_call__(buffer = nil, context: nil, view_context: nil, stream: view_context&.response&.stream || StringIO.new, parent: nil, &block)
-      super(buffer || TopLevelBuffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
+      super(buffer || Buffer.new(stream), context: context || Context.new, view_context:, parent:, &block)
     end
 
     def yield_content(...)

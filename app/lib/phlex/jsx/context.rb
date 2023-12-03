@@ -20,7 +20,7 @@ module Phlex
       end
 
       def add_react_slot(slot_name, &)
-        raise(Phlex::NameError.new("Called `##{slot_name}` but this element does not support slots")) if @react_slots_target.nil?
+        raise Phlex::NameError, "Called `##{slot_name}` but this element does not support slots" if @react_slots_target.nil?
 
         @react_slots_target[slot_name] = yield_content(&)
       end

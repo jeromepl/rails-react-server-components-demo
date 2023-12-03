@@ -4,7 +4,7 @@ require "async"
 
 module Phlex
   class JSX
-    class TopLevelBuffer
+    class Buffer
       TOP_LEVEL_INDEX_KEY = :__phlex_jsx_top_level_index
       private_constant :TOP_LEVEL_INDEX_KEY
 
@@ -15,15 +15,19 @@ module Phlex
         @index = 1 # Keep 0 for the top level element
       end
 
-      # Given this is the top level buffer, this method should only be called once, with
-      # the top level element
-      def <<(context_elements)
+      # Given this buffer is used to render "root" elements to the stream directly,
+      # this method should only be called once, with only the top level element
+      def <<(context_target)
+        raise RootElementError, "Expected to render a single root element but found #{context_target.size} elements at the root" if context_target.size != 1
+
         index = Thread.current[TOP_LEVEL_INDEX_KEY] || 0
-        stream.write("#{index}:#{context_elements.last.to_json}\n")
+        stream.write("#{index}:#{context_target.last.to_json}\n") # Use the last element as top level element
         ""
       end
       alias_method :write, :<<
 
+      # When using a new react component, we need to send through the stream the webpack definition
+      # of this component, which contains the name, file path and chunk id of this component
       def write_react_component(tag, webpack_definition)
         @write_react_component ||= {}
         @write_react_component[tag] ||= begin
@@ -41,13 +45,16 @@ module Phlex
         end
       end
 
+      # Start a new async process to render an async component (the block) and send through
+      # the stream a placeholder index that React will replace on the front-end once it receives
+      # the fully rendered data for this index.
       def async(&block)
         index = next_index
         Async do
           Thread.current[TOP_LEVEL_INDEX_KEY] = index
           block.call
         end
-        "$L#{index}"
+        "$L#{index}" # Placeholder used by React for the async component
       end
 
       private
