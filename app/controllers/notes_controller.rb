@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-class NotesController < ApplicationController
+class NotesController < ReactStreamController
+  def index
+    stream AppView.new(selected_id: props["selectedId"], is_editing: props["isEditing"], search_text: props["searchText"])
+  end
+
   def create
     note = Note.create!(title: params[:title], body: params[:body])
     stream AppView.new(selected_id: note.id, is_editing: false, search_text: props["searchText"])
@@ -12,7 +16,7 @@ class NotesController < ApplicationController
     stream AppView.new(selected_id: note.id, is_editing: false, search_text: props["searchText"])
   end
 
-  def delete
+  def destroy
     Note.find(params[:note_id]).destroy!
     stream AppView.new(selected_id: nil, is_editing: false, search_text: props["searchText"])
   end
@@ -20,6 +24,6 @@ class NotesController < ApplicationController
   private
 
   def props
-    @props ||= JSON.parse(params[:location])
+    @props ||= params.key?(:location) ? JSON.parse(params[:location]) : {}
   end
 end

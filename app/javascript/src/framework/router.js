@@ -35,7 +35,7 @@ export function Router() {
   let content = cache.get(locationKey);
   if (!content) {
     content = createFromFetch(
-      fetch('/rsc?location=' + encodeURIComponent(locationKey))
+      fetch('/notes?location=' + encodeURIComponent(locationKey))
     );
     cache.set(locationKey, content);
   }
