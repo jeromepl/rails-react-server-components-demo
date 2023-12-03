@@ -17,12 +17,12 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - postgres
-    command: ./bin/server
     volumes:
       - .:/app
     ports:
       - "3000:3000"
       - "3035:3035"
+    tty: true
 
 volumes:
   db:

@@ -4,11 +4,13 @@ https://www.plasmic.app/blog/how-react-server-components-work#the-rsc-wire-forma
 
 Running:
 ```
-docker compose up server
-docker compose exec server bin/shakapacker-dev-server
+bin/setup
 ```
+Then go to `localhost:3000`
 
-I think you currently need to run `docker compose exec server bin/shakapacker` in order to get the file `public/packs/react-client-manifest.json` which is used to detect client components and their corresponding webpack chunk.
+Requirements:
+- Ruby
+- Docker
 
 # React Server Components Demo
 
