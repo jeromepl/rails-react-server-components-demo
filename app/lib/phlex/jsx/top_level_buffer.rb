@@ -5,6 +5,9 @@ require "async"
 module Phlex
   class JSX
     class TopLevelBuffer
+      TOP_LEVEL_INDEX_KEY = :__phlex_jsx_top_level_index
+      private_constant :TOP_LEVEL_INDEX_KEY
+
       attr_reader :stream
 
       def initialize(stream)
@@ -15,7 +18,7 @@ module Phlex
       # Given this is the top level buffer, this method should only be called once, with
       # the top level element
       def <<(context_elements)
-        index = Thread.current[:top_level_index] || 0
+        index = Thread.current[TOP_LEVEL_INDEX_KEY] || 0
         stream.write("#{index}:#{context_elements.last.to_json}\n")
         ""
       end
@@ -41,7 +44,7 @@ module Phlex
       def async(&block)
         index = next_index
         Async do
-          Thread.current[:top_level_index] = index
+          Thread.current[TOP_LEVEL_INDEX_KEY] = index
           block.call
         end
         "$L#{index}"
