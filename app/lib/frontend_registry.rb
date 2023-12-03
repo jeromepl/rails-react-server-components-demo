@@ -10,7 +10,7 @@ module FrontendRegistry
                         response = Net::HTTP.get(URI("http://localhost:3000/packs/react-client-manifest.json"))
                         JSON.parse(response)
                       else
-                        JSON.load_file("public/packs/react-client-manifest.json")
+                        JSON.load_file(Rails.root.join("public/packs/react-client-manifest.json"))
                       end
 
     client_manifest.each_value.filter_map do |entry|
