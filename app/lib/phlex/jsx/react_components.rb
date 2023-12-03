@@ -3,7 +3,7 @@
 module Phlex
   class JSX
     module ReactComponents
-      extend Elements
+      include Elements
 
       FrontendRegistry::COMPONENTS.each do |component_name, webpack_definition|
         register_react_component(component_name, webpack_definition)

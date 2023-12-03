@@ -5,7 +5,7 @@ require "stringio"
 module Phlex
   # @abstract Subclass and define {#template} to create an HTML component class.
   class JSX < SGML
-    extend Elements
+    include Elements
     include Helpers
 
     include HtmlElements
