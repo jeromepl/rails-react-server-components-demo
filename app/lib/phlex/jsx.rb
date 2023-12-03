@@ -8,14 +8,7 @@ module Phlex
     extend Elements
     include Helpers
 
-    # Re-define HTML elements to be rendered following the React JSON format:
-    HTML::VoidElements.registered_elements.each_pair do |method_name, tag|
-      register_element(method_name, tag:)
-    end
-    HTML::StandardElements.registered_elements.each_pair do |method_name, tag|
-      register_element(method_name, tag:)
-    end
-
+    include HtmlElements
     include ReactComponents
 
     def call(buffer = nil, context: nil, view_context: nil, stream: view_context&.response&.stream || StringIO.new, parent: nil, &block)

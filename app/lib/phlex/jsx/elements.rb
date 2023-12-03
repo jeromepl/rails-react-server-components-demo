@@ -76,8 +76,8 @@ module Phlex
       # @return [Symbol] the name of the method created
       # @note The methods defined by this macro depend on other methods from {SGML} so they should always be mixed into an {HTML} or {SVG} component.
       # @example Register the custom element `<trix-editor>`
-      # 	register_element :trix_editor
-      def register_element(method_name, tag: nil)
+      # 	register_html_element :trix_editor
+      def register_html_element(method_name, tag: nil)
         tag ||= method_name.name.tr("_", "-")
 
         class_eval(<<-RUBY, __FILE__, __LINE__ + 1)
@@ -107,7 +107,7 @@ module Phlex
 
         method_name
       end
-      alias_method :register_void_element, :register_element
+      alias_method :register_void_element, :register_html_element
     end
   end
 end
