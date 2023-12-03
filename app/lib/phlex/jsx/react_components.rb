@@ -12,7 +12,7 @@ module Phlex
       # Suspense is a component available by default in RSC
       register_suspense
 
-      # For React components, we allow any "slots" as render them as props
+      # For React components, we allow any "slots" and render them as props
       # This allows passing JSX to a prop, for example to a Suspense component's fallback:
       # > suspense do |c|
       # >   c.fallback { strong { "Loading..." } }

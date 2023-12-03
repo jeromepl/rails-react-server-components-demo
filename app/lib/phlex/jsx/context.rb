@@ -21,7 +21,7 @@ module Phlex
 
       # TODO: How to clean up the caller syntax? Move to the JSX class?
       def add_react_slot(kaller, slot_name, &)
-        return if @react_slots_target.nil?
+        raise(Phlex::NameError.new("Called `##{slot_name}` but this element does not support slots")) if @react_slots_target.nil?
 
         @react_slots_target[slot_name] = yield_content(kaller, &)
       end
