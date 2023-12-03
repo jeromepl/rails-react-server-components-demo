@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
+'use client';
 
 import {marked} from 'marked';
 import sanitizeHtml from 'sanitize-html';
