@@ -46,7 +46,7 @@ class NoteComponent < ApplicationComponent
 
   def note
     @note ||= begin
-      sleep 1
+      sleep 1 # Simulate a slow DB
       Note.find(selected_id)
     end
   end
