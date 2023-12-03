@@ -20,7 +20,7 @@ module Phlex
     end
 
     def yield_content(...)
-      @_context.yield_content(self, ...)
+      @_context.yield_content(...)
     end
 
     def render(renderable, &block)

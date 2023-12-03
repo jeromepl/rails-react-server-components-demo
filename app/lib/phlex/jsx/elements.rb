@@ -13,20 +13,18 @@ module Phlex
           # frozen_string_literal: true
 
           def #{method_name}(**attributes, &block)
-            target = @_context.target
-
             rendered_slots = {}
             children = yield_content(react_slots_target: rendered_slots, &block) if block_given?
 
             props = {
-              **attributes, # TODO: __attributes__(**attributes),
+              **attributes,
               **rendered_slots,
               **{ children: }.compact_blank,
             }
             key = props.delete(:key)
 
             reference = @_buffer.write_react_component("#{tag}", #{webpack_definition})
-            target << ["$", reference, key, props]
+            @_context.target << ["$", reference, key, props]
 
             nil
           end
@@ -44,20 +42,18 @@ module Phlex
           # frozen_string_literal: true
 
           def suspense(**attributes, &block)
-            target = @_context.target
-
             rendered_slots = {}
             children = yield_content(react_slots_target: rendered_slots, &block) if block_given?
 
             props = {
-              **attributes, # TODO: __attributes__(**attributes),
+              **attributes,
               **rendered_slots,
               **{ children: }.compact_blank,
             }
             key = props.delete(:key)
 
             reference = @_buffer.write_suspense
-            target << ["$", reference, key, props]
+            @_context.target << ["$", reference, key, props]
 
             nil
           end
@@ -84,18 +80,16 @@ module Phlex
           # frozen_string_literal: true
 
           def #{method_name}(**attributes, &block)
-            target = @_context.target
-
             reference = "#{tag}"
             children = yield_content(&block) if block_given?
 
             props = {
-              **attributes, # TODO: __attributes__(**attributes),
+              **attributes,
               **{ children: }.compact_blank,
             }
             key = props.delete(:key)
 
-            target << ["$", reference, key, props]
+            @_context.target << ["$", reference, key, props]
 
             nil
           end

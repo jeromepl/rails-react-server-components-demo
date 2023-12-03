@@ -20,7 +20,7 @@ module Phlex
       def method_missing(m, *args, &block)
         return super unless block_given?
 
-        @_context.add_react_slot(self, m, &block)
+        @_context.add_react_slot(m, &block)
       end
     end
   end
