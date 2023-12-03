@@ -21,6 +21,7 @@ import {createFromFetch, createFromReadableStream} from 'react-server-dom-webpac
 
 const RouterContext = createContext();
 const initialCache = new Map();
+const CRSF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 
 export function Router() {
   const [cache, setCache] = useState(initialCache);
@@ -34,9 +35,7 @@ export function Router() {
   let content = cache.get(locationKey);
   if (!content) {
     content = createFromFetch(
-      // fetch('/react?location=' + encodeURIComponent(locationKey))
-      // fetch('/rails/rsc?location=' + encodeURIComponent(locationKey))
-      fetch('http://localhost:3000/rsc?location=' + encodeURIComponent(locationKey))
+      fetch('/rsc?location=' + encodeURIComponent(locationKey))
     );
     cache.set(locationKey, content);
   }
@@ -90,7 +89,7 @@ export function useMutation({endpoint, method}) {
     setIsSaving(true);
     try {
       const response = await fetch(
-        `http://localhost:3000${endpoint}?location=${encodeURIComponent(
+        `${endpoint}?location=${encodeURIComponent(
           JSON.stringify(requestedLocation)
         )}`,
         {
@@ -98,6 +97,7 @@ export function useMutation({endpoint, method}) {
           body: JSON.stringify(payload),
           headers: {
             'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': CRSF_TOKEN,
           },
         }
       );
