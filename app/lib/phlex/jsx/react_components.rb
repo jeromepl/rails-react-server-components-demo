@@ -5,7 +5,7 @@ module Phlex
     module ReactComponents
       extend Elements
 
-      FrontendRegistry::Components.each do |component_name, webpack_definition|
+      FrontendRegistry::COMPONENTS.each do |component_name, webpack_definition|
         register_react_component(component_name, webpack_definition)
       end
 
