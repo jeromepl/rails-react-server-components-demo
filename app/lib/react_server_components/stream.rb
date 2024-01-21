@@ -28,7 +28,7 @@ module ReactServerComponents
     # When using a new react component, we need to send through the output_stream the webpack definition
     # of this component, which contains the name, file path and chunk id of this component
     def write_react_component(tag, webpack_definition)
-      @write_react_component ||= {}
+      @write_react_component ||= Concurrent::Map.new
       @write_react_component[tag] ||= begin
         index = next_index
         output_stream.write("#{index}:I#{webpack_definition.to_json}\n")

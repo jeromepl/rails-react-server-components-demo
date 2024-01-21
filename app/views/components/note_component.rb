@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class NoteComponent < ApplicationComponent
-  include Phlex::JSX::AsyncRender
+  include ReactServerComponents::AsyncRender
 
   attr_reader :selected_id, :is_editing
 
@@ -46,7 +46,7 @@ class NoteComponent < ApplicationComponent
 
   def note
     @note ||= begin
-      sleep 1 # Simulate a slow DB
+      # sleep 1 # Simulate a slow DB
       Note.find(selected_id)
     end
   end

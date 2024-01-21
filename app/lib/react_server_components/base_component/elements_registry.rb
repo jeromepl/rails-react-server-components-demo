@@ -1,19 +1,18 @@
 # frozen_string_literal: true
 
-module Phlex
-  class JSX
-    module Elements
+module ReactServerComponents
+  class BaseComponent
+    module ElementsRegistry
       def self.included(base)
         base.extend ClassMethods
       end
 
-      def _render_to_react_stream_format(reference, attributes: {}, use_slots: false, &block)
-        rendered_slots = {}
-        children = yield_content(react_slots_target: use_slots ? rendered_slots : nil, &block) if block_given?
+      def _render_to_react_stream_format(reference, attributes: {}, &block)
+        children, rendered_slots = @_context.yield_content(&block) if block_given?
 
         props = {
           **attributes,
-          **rendered_slots,
+          **(rendered_slots || {}),
           **{ children: }.compact_blank,
         }
         key = props.delete(:key)
@@ -24,17 +23,17 @@ module Phlex
       end
 
       module ClassMethods
-        def register_react_component(component_name, webpack_definition)
+        def register_react_component(component_name, webpack_definition:)
           define_method(component_name) do |**attributes, &block|
             reference = @_buffer.write_react_component(component_name, webpack_definition)
-            _render_to_react_stream_format(reference, attributes:, use_slots: true, &block)
+            _render_to_react_stream_format(reference, attributes:, &block)
           end
         end
 
         def register_suspense
           define_method(:suspense) do |&block|
             reference = @_buffer.write_suspense
-            _render_to_react_stream_format(reference, use_slots: true, &block)
+            _render_to_react_stream_format(reference, &block)
           end
         end
 

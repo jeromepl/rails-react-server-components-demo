@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class NoteListComponent < ApplicationComponent
-  include Phlex::JSX::AsyncRender
+  include ReactServerComponents::AsyncRender
 
   attr_reader :search_text
 
@@ -33,7 +33,7 @@ class NoteListComponent < ApplicationComponent
 
   def notes
     @notes ||= begin
-      # sleep 2
+      sleep 2
       Note.where("title ILIKE ?", "%#{search_text}%").order(updated_at: :desc)
     end
   end
