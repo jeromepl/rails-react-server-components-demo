@@ -10,10 +10,12 @@ module Phlex
       end
 
       def yield_content(react_slots_target: nil, &block)
+        return unless block_given?
+
         wrap_with_react_slots_target(react_slots_target) do
           content_target = []
           content_string = nil
-          capturing_into(content_target) { content_string = block.call(block.binding.receiver) } if block_given?
+          capturing_into(content_target) { content_string = block.call(block.binding.receiver) }
           content_target << content_string if content_string.is_a?(String)
           content_target
         end
