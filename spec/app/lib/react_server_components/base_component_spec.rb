@@ -138,4 +138,61 @@ RSpec.describe ReactServerComponents::BaseComponent do
       )
     end
   end
+
+  context "given a suspense is used" do
+    let(:test_component) do
+      Class.new(described_class) do
+        def template
+          div class: "Hi" do
+            suspense do |c|
+              c.fallback { loading_title }
+
+              render AsyncComponent.new
+            end
+          end
+        end
+
+        def loading_title
+          p { "Loading..." }
+        end
+      end
+    end
+
+    let(:async_component) do
+      Class.new(described_class) do
+        include ReactServerComponents::AsyncRender
+
+        def template
+          sleep 0.1
+          h1 { "This is a title" }
+        end
+      end
+    end
+
+    before do
+      stub_const("AsyncComponent", async_component)
+    end
+
+    it "renders correctly" do
+      expect(subject).to eq(
+        [
+          [1, "$Sreact.suspense"],
+          [2, ["$", "h1", nil, {
+            "children" => ["This is a title"],
+          }]],
+          [0, ["$", "div", nil, {
+            "children" => [
+              ["$", "$1", nil, {
+                "fallback" => [["$", "p", nil, {
+                  "children" => ["Loading..."]
+                }]],
+                "children" => ["$L2"],
+              }],
+            ],
+            "class" => "Hi"
+          }]],
+        ]
+      )
+    end
+  end
 end
