@@ -28,14 +28,14 @@ module ReactServerComponents
       module ClassMethods
         def register_react_component(component_name, webpack_definition:)
           define_method(component_name) do |**attributes, &block|
-            reference = @_buffer.write_react_component(component_name, webpack_definition)
+            reference = @_stream.write_react_component(component_name, webpack_definition)
             _render_to_react_stream_format(reference, attributes:, allow_slots: true, &block)
           end
         end
 
         def register_suspense
           define_method(:suspense) do |&block|
-            reference = @_buffer.write_suspense
+            reference = @_stream.write_suspense
             _render_to_react_stream_format(reference, allow_slots: true, &block)
           end
         end

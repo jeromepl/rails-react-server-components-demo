@@ -11,8 +11,8 @@ module ReactServerComponents
       yield(self)
     end
 
-    def call(buffer, context: Context.new, view_context: nil, parent: nil, &block)
-      @_buffer = buffer
+    def call(stream, context: Context.new, view_context: nil, parent: nil, &block)
+      @_stream = stream
 			@_context = context
 			@_view_context = view_context
 			@_parent = parent
@@ -21,20 +21,20 @@ module ReactServerComponents
       # Allow rendering a simple string as long as it's last line of the block:
       @_context.target << content_string if content_string.is_a?(String)
 
-      @_buffer << @_context.target unless @_parent
+      @_stream << @_context.target unless @_parent
     end
 
     def render(renderable, &block)
       case renderable
       when AsyncRender
-        reference = @_buffer.async do
+        reference = @_stream.async do
           # Not passing `parent:` indicates that this component should be written to the stream as a separate entry
-          renderable.call(@_buffer, context: Context.new, view_context: @_view_context, &block)
+          renderable.call(@_stream, context: Context.new, view_context: @_view_context, &block)
         end
         @_context.target << reference # Put the placeholder of the async component
         nil
       else
-        renderable.call(@_buffer, context: @_context, view_context: @_view_context, parent: self, &block)
+        renderable.call(@_stream, context: @_context, view_context: @_view_context, parent: self, &block)
       end
     end
 

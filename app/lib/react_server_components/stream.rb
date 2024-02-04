@@ -14,7 +14,7 @@ module ReactServerComponents
       @index = 1 # Keep 0 for the top level element
     end
 
-    # Given this buffer is used to render "root" elements to the output_stream directly,
+    # Given this stream is used to render "root" elements to the output_stream directly,
     # this method should only be called once, with only the top level element
     def <<(context_target)
       raise RootElementError, "Expected to render a single root element but found #{context_target.size} elements at the root" if context_target.size != 1
