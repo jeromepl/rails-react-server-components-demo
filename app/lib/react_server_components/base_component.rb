@@ -8,7 +8,7 @@ module ReactServerComponents
     include ElementsRegistry
 
     def template
-      yield
+      yield(self)
     end
 
     def call(buffer, context: Context.new, view_context: nil, parent: nil, &block)
@@ -17,7 +17,9 @@ module ReactServerComponents
 			@_view_context = view_context
 			@_parent = parent
 
-      template(&block)
+      content_string = template(&block)
+      # Allow rendering a simple string as long as it's last line of the block:
+      @_context.target << content_string if content_string.is_a?(String)
 
       @_buffer << @_context.target unless @_parent
     end
@@ -36,8 +38,8 @@ module ReactServerComponents
       end
     end
 
-    def yield_content(...)
-      @_context.yield_content(...)
+    def yield_content(&block)
+      @_context.capturing_into([], &block)
     end
 
     # Method called by Rails when calling `render MyComponent.new` from a controller
