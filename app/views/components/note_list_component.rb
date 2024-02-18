@@ -14,7 +14,7 @@ class NoteListComponent < ApplicationComponent
       ul class: "notes-list" do
         notes.map do |note|
           li key: note.id do
-            sidebar_note note:
+            render SidebarNoteComponent.new(note:)
           end
         end
       end
