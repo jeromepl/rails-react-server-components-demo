@@ -21,7 +21,7 @@ class NoteComponent < ApplicationComponent
         end
         div class: "note-menu", role: "menubar" do
           small class: "note-updated-at", role: "status" do
-            "Last updated on #{note.updated_at}"
+            "Last updated on #{note.updated_at.to_fs(:short)}"
           end
           edit_button noteId: note.id do
             "Edit"
