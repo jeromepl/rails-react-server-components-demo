@@ -28,7 +28,7 @@ class NoteComponent < ApplicationComponent
           end
         end
       end
-      note_preview body: note.body
+      render NotePreviewComponent.new(body: note.body)
     end
   end
 

@@ -40,6 +40,11 @@ gem "rack-cors"
 gem "async"
 gem "phlex-rails"
 
+gem "shakapacker", "= 7.1"
+
+# Markdown renderer, to replace JS's `marked` package
+gem "redcarpet"
+
 group :development, :test do
   gem "rspec-rails", "~> 6.0.0"
   gem "super_diff"
@@ -49,6 +54,3 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
-
-
-gem "shakapacker", "= 7.1"
