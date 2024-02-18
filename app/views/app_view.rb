@@ -24,7 +24,7 @@ class AppView < ApplicationView
         end
         nav do
           suspense do |c|
-            c.fallback { note_list_skeleton }
+            c.fallback { render NoteListSkeletonComponent.new }
 
             render NoteListComponent.new(search_text:)
           end
@@ -32,7 +32,7 @@ class AppView < ApplicationView
       end
       section key: selected_id, class: "col note-viewer" do
         suspense do |c|
-          c.fallback { note_skeleton(is_editing:) }
+          c.fallback { render NoteSkeletonComponent.new(is_editing:) }
 
           render NoteComponent.new(selected_id:, is_editing:)
         end
