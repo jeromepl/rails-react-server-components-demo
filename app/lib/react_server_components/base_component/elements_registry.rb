@@ -18,7 +18,7 @@ module ReactServerComponents
           **(proxy&._rendered_slots || {}),
           **{ children: }.compact_blank,
         }
-        key = props.delete(:key)
+        key = props.delete(:key)&.to_s
 
         @_context.target << ["$", reference, key, props]
 
