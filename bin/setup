@@ -18,6 +18,9 @@ FileUtils.chdir APP_ROOT do
   puts "\n== Starting services =="
   system! "docker compose up --detach --remove-orphans server"
 
+  puts "\n== Installing JS dependencies =="
+  system! "docker compose exec server yarn install --check-files"
+
   puts "\n== Starting webpack dev server =="
   system! "docker compose exec -d server bin/shakapacker-dev-server"
 
