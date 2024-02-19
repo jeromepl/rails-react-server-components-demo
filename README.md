@@ -1,27 +1,43 @@
-# My Section
+# React Server Components... in Rails?
 
-https://www.plasmic.app/blog/how-react-server-components-work#the-rsc-wire-format
+> I am working on a blog post to go into more details about how this works. Stay tuned!
 
-Running:
-```
-bin/setup
-```
-Then go to `localhost:3000`
+This repo is a demo of how React Server Components can be used in other backend languages than NodeJS.
+It reproduces the [React `server-components-demo`](https://github.com/reactjs/server-components-demo) and reuses most of its front-end code but with a Ruby on Rails back-end.
 
-Requirements:
+It works as a regular Rails app with a bundled javascript front-end (through [`shackapaker`](https://github.com/shakacode/shakapacker)), except that the `/notes` route renders the page in React's special "RSC wire format" and **streams** it to the front-end. This is in essence mimicking what React's [`renderToPipeableStream`](https://react.dev/reference/react-dom/server/renderToPipeableStream#rendertopipeablestream) NodeJS API does.
+
+To define back-end components that can then be rendered in this RSC wire format, this demo defines components in a [Phlex](https://www.phlex.fun/)-like format (the rendering logic for this lives in `app/lib/react_server_components`). This made it easier to reproduce the original demo's javascript components in Ruby and hopefully also makes it easier to eventually support any other Phlex component.
+
+This demo showcases two key functionality that weren't possible before:
+
+1. The ability to send to the front-end instructions to not just render specific React components, but also render them with HTML or even other React components **as children**.
+2. **Streaming components** as they become available and making use of React's `Suspense` to show a fallback while waiting for the result.
+
+## Limitations
+- Using Ruby on Rails as a backend means that we lose the ability to reuse components on both the front-end and the back-end. A Javascript component can only be used for client-side rendering while a Ruby component can only be used for server-side rendering.
+  - There was one such component in the React Server Components demo: `NotePreview`. This component was duplicated on the back-end for the purposes of this proof-of-concept. However it might be preferable to completely move this component to the front-end to ensure consistent rendering of the notes' body text.
+
+## Setup:
+To run this app, first make sure you have the following requirements:
 - Ruby
 - Docker
 
-# React Server Components Demo
+Then simply run:
+```
+bin/setup
+```
+And navigate to `localhost:3000` to see the app.
+
+## _Content from the original demo's Readme_
+
+> 👇 Below is the relevant sections of the original server-components-demo repo, adapted to the Rails framework where needed.
+
+## Table of Content
 
 * [What is this?](#what-is-this)
 * [When will I be able to use this?](#when-will-i-be-able-to-use-this)
 * [Should I use this demo for benchmarks?](#should-i-use-this-demo-for-benchmarks)
-* [Setup](#setup)
-* [DB Setup](#db-setup)
-  + [Step 1. Create the Database](#step-1-create-the-database)
-  + [Step 2. Connect to the Database](#step-2-connect-to-the-database)
-  + [Step 3. Run the seed script](#step-3-run-the-seed-script)
 * [Notes about this app](#notes-about-this-app)
   + [Interesting things to try](#interesting-things-to-try)
 * [Built by (A-Z)](#built-by-a-z)
@@ -48,86 +64,12 @@ If you use this demo to compare React Server Components to the framework of your
 
 This demo is provided “as is” to show the parts that are ready for experimentation. It is not intended to reflect the performance characteristics of a real app driven by a future stable release of Server Components.
 
-## Setup
-
-You will need to have [Node 18 LTS](https://nodejs.org/en) in order to run this demo. (If you use `nvm`, run `nvm i` before running `npm install` to install the recommended Node version.)
-
-  ```
-  npm install --legacy-peer-deps
-  npm start
-  ```
-
-(Or `npm run start:prod` for a production build.)
-
-Then open http://localhost:4000.
-
-The app won't work until you set up the database, as described below.
-
-<details>
-  <summary>Setup with Docker (optional)</summary>
-  <p>You can also start dev build of the app by using docker-compose.</p>
-  <p>⚠️ This is <b>completely optional,</b> and is only for people who <i>prefer</i> Docker to global installs!</p>
-  <p>If you prefer Docker, make sure you have docker and docker-compose installed then run:</p>
-  <pre><code>docker-compose up</code></pre>
-  <h4>Running seed script</h4>
-  <p>1. Run containers in the detached mode</p>
-  <pre><code>docker-compose up -d</code></pre>
-  <p>2. Run seed script</p>
-  <pre><code>docker-compose exec notes-app npm run seed</code></pre>
-  <p>If you'd rather not use Docker, skip this section and continue below.</p>
-</details>
-
-## DB Setup
-
-This demo uses Postgres. First, follow its [installation link](https://wiki.postgresql.org/wiki/Detailed_installation_guides) for your platform.
-
-Alternatively, you can check out this [fork](https://github.com/pomber/server-components-demo/) which will let you run the demo app without needing a database. However, you won't be able to execute SQL queries (but fetch should still work). There is also [another fork](https://github.com/prisma/server-components-demo) that uses Prisma with SQLite, so it doesn't require additional setup.
-
-The below example will set up the database for this app, assuming that you have a UNIX-like platform:
-
-### Step 1. Create the Database
-
-```
-psql postgres
-
-CREATE DATABASE notesapi;
-CREATE ROLE notesadmin WITH LOGIN PASSWORD 'password';
-ALTER ROLE notesadmin WITH SUPERUSER;
-ALTER DATABASE notesapi OWNER TO notesadmin;
-\q
-```
-
-### Step 2. Connect to the Database
-
-```
-psql -d postgres -U notesadmin;
-
-\c notesapi
-
-DROP TABLE IF EXISTS notes;
-CREATE TABLE notes (
-  id SERIAL PRIMARY KEY,
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP NOT NULL,
-  title TEXT,
-  body TEXT
-);
-
-\q
-```
-
-### Step 3. Run the seed script
-
-Finally, run `npm run seed` to populate some data.
-
-And you're done!
-
 ## Notes about this app
 
 The demo is a note-taking app called **React Notes**. It consists of a few major parts:
 
 - It uses a Webpack plugin (not defined in this repo) that allows us to only include client components in build artifacts
-- An Express server that:
+- A ~~Express~~ Rails server that:
   - Serves API endpoints used in the app
   - Renders Server Components into a special format that we can read on the client
 - A React app containing Server and Client components used to build React Notes
@@ -141,15 +83,15 @@ This demo is built on top of our Webpack plugin, but this is not how we envision
 - Search for any title. With the search text still in the search input, create a new note with a title matching the search text. What happens?
 - Search while on Slow 3G, observe the inline loading indicator.
 - Switch between two notes back and forth. Observe we don't send new responses next time we switch them again.
-- Uncomment the `await fetch('http://localhost:4000/sleep/....')` call in `Note.js` or `NoteList.js` to introduce an artificial delay and trigger Suspense.
-  - If you only uncomment it in `Note.js`, you'll see the fallback every time you open a note.
-  - If you only uncomment it in `NoteList.js`, you'll see the list fallback on first page load.
+- Uncomment the ~~`await fetch('http://localhost:4000/sleep/....')`~~ `sleep 2` call in ~~`Note.js`~~ `NoteComponent.rb` or ~~`NoteList.js`~~ `NoteListComponent.rb` to introduce an artificial delay and trigger Suspense.
+  - If you only uncomment it in the Note component, you'll see the fallback every time you open a note.
+  - If you only uncomment it in the NoteList component, you'll see the list fallback on first page load.
   - If you uncomment it in both, it won't be very interesting because we have nothing new to show until they both respond.
-- Add a new Server Component and place it above the search bar in `App.js`. Import `db` from `db.js` and use `await db.query()` from it to get the number of notes. Oberserve what happens when you add or delete a note.
+- Add a new Server Component and place it above the search bar in ~~`App.js`~~ `AppView.rb`. ~~Import `db` from `db.js` and use `await db.query()` from it~~ Make a query using active record and the `Note` model to get the number of notes. Oberserve what happens when you add or delete a note.
 
 You can watch a [recorded walkthrough of all these demo points here](https://youtu.be/La4agIEgoNg?t=600) with timestamps. (**Note:** this recording is slightly outdated because the repository has been updated to match the [latest conventions](https://react.dev/blog/2023/03/22/react-labs-what-we-have-been-working-on-march-2023#react-server-components).)
 
-## Built by (A-Z)
+## _(Original React demo)_ Built by (A-Z)
 
 - [Andrew Clark](https://twitter.com/acdlite)
 - [Dan Abramov](https://twitter.com/dan_abramov)
@@ -158,8 +100,11 @@ You can watch a [recorded walkthrough of all these demo points here](https://you
 - [Sebastian Markbåge](https://twitter.com/sebmarkbage)
 - [Tate Strickland](http://www.tatestrickland.com/) (Design)
 
-## [Code of Conduct](https://engineering.fb.com/codeofconduct/)
-Facebook has adopted a Code of Conduct that we expect project participants to adhere to. Please read the [full text](https://engineering.fb.com/codeofconduct/) so that you can understand what actions will and will not be tolerated.
-
 ## License
 This demo is MIT licensed.
+
+## Additional References
+- https://www.joshwcomeau.com/react/server-components/
+- https://www.plasmic.app/blog/how-react-server-components-work#the-rsc-wire-format
+- https://react.dev/reference/react-dom/server/renderToPipeableStream#rendertopipeablestream
+- https://github.com/reactwg/server-components/discussions/5
