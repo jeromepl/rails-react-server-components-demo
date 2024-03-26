@@ -26,11 +26,9 @@ class NoteSkeletonComponent < ApplicationComponent
         end
         div class: "note-title skeleton", style: { height: "3rem", width: "65%", marginInline: "12px 1em" }
         div class: "note-preview" do
-          div class: "skeleton v-stack", style: { height: "1.5em" }
-          div class: "skeleton v-stack", style: { height: "1.5em" }
-          div class: "skeleton v-stack", style: { height: "1.5em" }
-          div class: "skeleton v-stack", style: { height: "1.5em" }
-          div class: "skeleton v-stack", style: { height: "1.5em" }
+          5.times do
+            div class: "skeleton v-stack", style: { height: "1.5em" }
+          end
         end
       end
     end
@@ -43,11 +41,9 @@ class NoteSkeletonComponent < ApplicationComponent
         div class: "skeleton skeleton--button", style: { width: "8em", height: "2.5em" }
       end
       div class: "note-preview" do
-        div class: "skeleton v-stack", style: { height: "1.5em" }
-        div class: "skeleton v-stack", style: { height: "1.5em" }
-        div class: "skeleton v-stack", style: { height: "1.5em" }
-        div class: "skeleton v-stack", style: { height: "1.5em" }
-        div class: "skeleton v-stack", style: { height: "1.5em" }
+        5.times do
+          div class: "skeleton v-stack", style: { height: "1.5em" }
+        end
       end
     end
   end

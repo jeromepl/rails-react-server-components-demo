@@ -17,7 +17,7 @@ module ReactServerComponents
       end
 
       def method_missing(m, *args, &block)
-        return unless allow_slots
+        return super unless allow_slots
         return super unless block_given?
 
         _rendered_slots[m] = yield_content(&block)
